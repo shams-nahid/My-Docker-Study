@@ -1,4 +1,4 @@
-## Essential
+## Docker 101
 
 ### What is Docker?
 

@@ -160,3 +160,31 @@ If we build the image from the same `Dockerfile` for the 3rd time, it will take 
 ### Tagging a docker image
 
 ---
+
+Till now, we have created `image` from the `Dockerfile` and getting an `image_id`.
+
+When we want a name instead of an `image_id` we can use the `tagging`.
+
+To get a name, after a `image` being created, we can use the following
+
+```bash
+docker build -t user_name/image_name:version_number .
+```
+
+This will return
+
+```bash
+Successfully tagged user_name/image_name:version_number
+```
+
+> Here the `user_name` is the `username`, that is used to login to the `docker-hub`. `image_name` is our desired image name. The `version_number` is the `image` version number. Instead of `version_number` we can use `lated` keyword to use the latest version number handled by the docker itself.
+
+We can now run the docker with the tag
+
+```bash
+docker run user_name/image_name:version_number
+```
+
+Here only the `version_number` is the tag itself. The `user_name` itself is always the `docker id` and `image_name` is the project name or the `repo name`.
+
+> While running our tagged custom `image` we can ignore the `version_number`. It will simply take the latest version.

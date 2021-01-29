@@ -25,7 +25,11 @@ Now create a file named `index.js` and create a server. `index.js` should be lik
 ```js
 const express = require('express');
 const app = express();
+
+// from browser, a get request in `/` route, should return `Hi There!!`
 app.get('/', (req, res) => res.send('Hi There!!'));
+
+// app will be run on port `8080`
 app.listen(8080);
 ```
 
@@ -117,11 +121,20 @@ docker build -t bmshamsnahid/myapp .
 After build the image, let run it with the `tag`,
 
 ```bash
+# Import the base image
 FROM node:alpine
+
+# Create a working directory for the app
 WORKDIR /usr/app
+
+# Only if we change the `package.json` file, the npm will install all the modules along with the new one
 COPY ./package.json ./
 RUN npm install
+
+# Copy all the project files to the `container`
 COPY ./ ./
+
+# Set the start up command to run the server
 CMD ["node", "index.js"]
 ```
 

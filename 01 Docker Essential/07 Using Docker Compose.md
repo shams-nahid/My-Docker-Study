@@ -16,6 +16,18 @@ To make use of `docker-compose`, we essentially going to the `docker-cli` startu
 
 After creating the `docker-compose.yml` file, we will feed the file to the `docker-compose-cli` to parse the file and create container with our desired configurations.
 
+In `windows` and `mac` OS the `docker-compose` is shipped with the `docker` installation. But for linux machines, you might need to install the `docker-compose` library separately. To install the `docker-compose` in `Ubuntu 20.04`, that I am using, can follow the [instructions](https://stackoverflow.com/questions/36685980/docker-is-installed-but-docker-compose-is-not-why)
+
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)"  -o /usr/local/bin/docker-compose
+
+sudo mv /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+sudo chmod +x /usr/bin/docker-compose
+```
+
+First instruction download the library, second one move it to `/usr/bin/docker-compose` and using the third instruction, we are giving the `docker-compose` appropriate permissions.
+
 ### A Hands On
 
 ---
@@ -32,7 +44,7 @@ We can consider a single container with both `node server` and `redis server` in
 
 For more traffic, if we increase the number of containers, for each container, there will be individual `node server` and `redis server`. Also each `redis server` will be isolated from each others. So one `redis server` will give us total visit of `10`, another `redis server` will give us total visit of `5`.
 
-So our actual approach will be both `node server` and `redis server` will be in isolated container. An in case of scaling we will scale the `node-server-container` and all the `node-server-container` will be connected to the single `redis-server-container`.
+So our actual approach will be both `node server` and `redis server` will be in isolated container. An in case of scaling we will scale the `node-app-container` and all the `node-app-container` will be connected to the single `redis-server-container`.
 
 ### Creating The Node Server
 
@@ -67,7 +79,10 @@ const express = require('express');
 const redis = require('redis');
 
 const app = express(); // create app instance
-const client = redis.createClient(); // connect the node server with redis server
+const client = redis.createClient({
+  host: 'redis-server', // service name of the `redis-server` we are using, will be defined in the `services` section of `docker-compose.yml` file
+  port: 6379 // default port of the `redis-server`
+}); // connect the node server with redis server
 client.set('visits', 0); // initially set number of visits to 0
 
 app.get('/', (req, res) => {
@@ -122,9 +137,9 @@ Now let's build the image,
 docker build -t docker_user_id/repo_name:latest .
 ```
 
-This will create the `image` of our `node-server` named `docker_user_id/repo_name`.
+This will create the `image` of our `node-app` named `docker_user_id/repo_name`.
 
-Now if we try to run the `node-server` (Although it will throw error, because `redis` server is not running yet),
+Now if we try to run the `node-app` (Although it will throw error, because `redis` server is not running yet),
 
 ```bash
 docker run docker_user_id/repo_name
@@ -154,7 +169,7 @@ Emitted 'error' event on RedisClient instance at:
 }
 ```
 
-In summary, it says, the `node-server` can not connect to the `redis-server`, as expected. We will fix it now.
+In summary, it says, the `node-app` can not connect to the `redis-server`, as expected. We will fix it now.
 
 ### `Redis` Server
 
@@ -164,10 +179,109 @@ We can use vanilla `redis` image from `docker-hub`. We will simply run the `redi
 docker run redis
 ```
 
-Even with running the `redis-server`, if we run the `node-server` again, we will get the same error as before.
+Even with running the `redis-server`, if we run the `node-app` again, we will get the same error as before.
 
-Since both `node-server` and `redis-server` is in isolated container and there is no networking communication between them, the `node-server` will not be able to communicate with the `redis-server`.
+Since both `node-app` and `redis-server` is in isolated container and there is no networking communication between them, the `node-app` will not be able to communicate with the `redis-server`.
 
 ### Bring The `Docker Compose`
 
 ---
+
+With `docker-compose` first we do the following configurations:
+
+- For `redis-server` make use of the `redis` image
+- For `node-app` make use of the `Dockerfile`
+- Also for the `node-app` map port `8081` from local machine port `4001`
+
+By defining multiple services in the `docker-compose`, docker will put all the services essentially the same network. And as a result the containers can access each other freely.
+
+> There are different versions of `docker-compose`. Here we will use version `3` as our `docker-version`.
+
+> In the `docker-compose` the `redis-server` and the `node-app` are considered as `services`.
+
+> For a `service` in the `docker-compose`, we have to define how we get the image. It could be an image from the `docker-hub` or from the `Dockerfile` we wrote. For `redis-server` we will use `docker-hub` image and for the `node-app` we will use our made up `Dockerfile`
+
+> For an `service` we can do the port mapping between local machine and container.
+
+To do so, in the project directory, first create the `docker-compose.yml` file
+
+```bash
+touch docker-compose.yml
+```
+
+Now our `docker-compose.yml` file be
+
+```yml
+version: '3'
+services:
+  redis-server:
+    image: 'redis'
+  node-app:
+    build: .
+    ports:
+      - '4001:8081'
+```
+
+We used to run the container by `docker run my_image_name`, which is similar to `docker-compose up`.
+
+We used 2 commands, one for `build` the image and another for `run` the container. The `docker-compose up --build` is similar to the followings existing commands,
+
+```bash
+docker build .
+docker run my_image_name
+```
+
+So to build and run our two docker image we can use the followings,
+
+```
+docker-compose up --build
+```
+
+This will
+
+- Run container for `redis-server`
+- Build image for `node-app`
+- Run container for `node-app`
+- Put both container in same network
+- Start the `redis-server` container
+- Start the `node-app` container
+
+In output we should see
+
+```
+App is listening on port: 8081
+```
+
+Since we map port `4001` from local machine to `8081` of the host machine, from browser, we can access the `node-app` by `http://localhost:4001/`. If we go the browser `http://localhost:4001/`, we should see
+
+```
+Number of Visits: visit_count
+```
+
+### Stop Containers with Docker Compose
+
+With `docker-cli` we used to run a container background using
+
+```bash
+docker run -d image_id
+```
+
+To stop the instance, we used
+
+```bash
+docker stop image_id
+```
+
+With `docker-compose`, to run the containers in background, we can use the following command,
+
+```bash
+docker-compose up -d
+```
+
+Also to stop all the containers using the `docker-compose` we can use the followings,
+
+```bash
+docker-compose down
+```
+
+We can verify if the container being stopped or not by `docker ps`.

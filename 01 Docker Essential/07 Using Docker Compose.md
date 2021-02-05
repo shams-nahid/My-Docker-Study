@@ -167,3 +167,7 @@ docker run redis
 Even with running the `redis-server`, if we run the `node-server` again, we will get the same error as before.
 
 Since both `node-server` and `redis-server` is in isolated container and there is no networking communication between them, the `node-server` will not be able to communicate with the `redis-server`.
+
+### Bring The `Docker Compose`
+
+---

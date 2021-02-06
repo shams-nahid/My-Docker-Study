@@ -201,7 +201,9 @@ By defining multiple services in the `docker-compose`, docker will put all the s
 
 > For a `service` in the `docker-compose`, we have to define how we get the image. It could be an image from the `docker-hub` or from the `Dockerfile` we wrote. For `redis-server` we will use `docker-hub` image and for the `node-app` we will use our made up `Dockerfile`
 
-> For an `service` we can do the port mapping between local machine and container.
+> For a `service` we can do the port mapping between local machine and container.
+
+> For a `service` we can use a restart policy, discussed in details in the `maintenance` section.
 
 To do so, in the project directory, first create the `docker-compose.yml` file
 
@@ -217,6 +219,7 @@ services:
   redis-server:
     image: 'redis'
   node-app:
+    restart: always
     build: .
     ports:
       - '4001:8081'
@@ -285,3 +288,53 @@ docker-compose down
 ```
 
 We can verify if the container being stopped or not by `docker ps`.
+
+### Container Maintenance with Docker Compose
+
+---
+
+It is possible that, out `node-server` may crash or hang over time. In this case, we might want to restart the server.
+
+In `docker-compose` there are 4 different restart policy,
+
+1. **no**: Never restart the container, no matter what happen. This is default restart policy.
+2. **always**: If the container stops for any reason, the `docker-compose` will restart the server.
+3. **on-failure**: Only restart the container, if it crashes with an `error-code`.
+4. **unless-stopped**: Always restart the container on crash except developer forcibly stop it.
+
+We need to put this `restart-policy` under the `service` declaration.
+
+In `node.js` we can exit from the app with `process.exit(exit_code)`. As exit code, we have
+
+- `0`, means everything is okay and we want to exit from the node application
+- `non-zero`, any value other than `0` means, there's something wrong and the `error-code` specifies that issue.
+
+The `restart-policy` of `always` work on when it encounters the `0` as `error-code`.
+
+If we use `restart-policy` as `on-failure`, we have to use `error-code` other than zero.
+
+Finally, If we use `unless-stopped` as `restart-policy`, then the `container` will always restart, unless we (`develop`) stop in from the `terminal`.
+
+> As `restart-policy`, if we use `no` then we have to put `no` inside a quote. Because in `yml` file, `no` is interpreted as `false`. For other `restart-policy` like, `always`, `on-failure` or `unless-stopped` we can use plain text without the `quote`.
+
+> Between, `always` and `on-failure` use cases, we might 100% time want a public web server restarted on crash. In this case, we use `always`. If we do some worker process, that is meant to do some specific job and then exit, then thats a good case to use `on-failure` exit policy.
+
+### Checking Container Status With `Docker Compose`
+
+---
+
+Traditionally, we used to check the container status using the `docker-cli` by
+
+```bash
+docker ps
+```
+
+`Docker Compose` has a similar command,
+
+```bash
+docker-compose ps
+```
+
+This command should be executed inside the project directory, where the `docker-compose.yml` file exist.
+
+So, only the `containers` defined inside the `docker-compose` status will be displayed.

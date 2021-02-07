@@ -1,4 +1,4 @@
-## Production Workflow
+## Production App Workflow With Docker
 
 Let's use docker in a production type environment. The important thing to keep in mind, we first explain the workflow without docker. Instead we discuss outside services that we are going to use to set up this development workflow. Once we get the bird view of the workflow and get the core design behind the workflow, then we introduce the docker and find how docker can facilitate everything.
 
@@ -16,4 +16,105 @@ Also for any changes, we will repeat the workflow again.
 
 **Production Phase :** After merging the feature branch, We then again push the code to `Travis CI` and run tests of the code. Any changes on the master branch will eventually and automatically be hosted in the `AWS Beanstalk`.
 
-Now we need to find out how `docker` fits in this place.
+Now we need to find out how `docker` fits in this place. To execute this workflow, we do not need to make use of `Docker`. But using docker will make the workflow lot lot easier. Thats the soul purpose of docker. It's not necessarily a requirement, it just make developer life easier.
+
+Docker is not the focus here, it's more of using these 3rd party services (like, Github, Travis CI, AWS Beanstalk) with docker.
+
+### Generating a Project
+
+---
+
+We will use a `react` for simplicity. To create a react project, make sure `node.js` is installed in your system. Then create the project named `frontend` by the followings,
+
+```bash
+npm create-react-app frontend
+```
+
+This will create the react project and install all the necessary dependencies.
+
+Now go to the project directory,
+
+```bash
+cd frontend
+```
+
+To run the test in local machine, we can use
+
+```bash
+npm run test
+```
+
+To build the application for future deployment, we can build using
+
+```bash
+npm run build
+```
+
+An finally to run the application in the local environment, we can use
+
+```bash
+npm run start
+```
+
+### Generating Dev Dockerfile
+
+---
+
+First go to the project directory. Here we will create a `Dockerfile` named `Dockerfile.dev`. The purpose of using `.dev` with the `Dockerfile` is to make clear that, this docker file is only using in the development environment.
+
+In future, we will use another `Dockerfile` with simply name `Dockerfile`, without any extension for our production environment.
+
+So, lets create the `Dockerfile.dev` in the project root directory,
+
+```bash
+touch Dockerfile.dev
+```
+
+Inside the `Dockerfile.dev` we will write configuration to make our image.
+
+Our `Dockerfile.dev` will be similar like the following.
+
+```docker
+# Define base image
+FROM node:alpine
+
+# Define working directory inside the container
+WORKDIR '/app'
+
+# Copy the package.json file to the project directory
+COPY package.json .
+# Install the dependencies
+RUN npm install
+
+# Copy all the source code from host machine to the container project directory
+COPY . .
+
+# Start up command of the container to run the server
+CMD ["npm", "run", "start"]
+```
+
+### Building Image From Dockerfile
+
+---
+
+Since we are not using default name of `Dockerfile`, instead we are using `Dockerfile.dev` we have to specify the name during building image. To do so, we can use `-f` flag, that helps to specify the `docker file` name. This time, during development, our build instruction will be,
+
+```bash
+docker build -f Dockerfile.dev .
+```
+
+When we initially create our react application using `create-react-app`, the `create-react-app` automatically install all the `node modules` inside the `node_modules` directory. Now, when we are building the image out of the app, we will again installing the dependencies using `RUN npm install` instruction in the `Dockerfile.dev` file. We do not need the `node_modules` in the host machine, it usually increase the duration of image building process, since we are running the app inside the `container`. So we can delete the `node_modules` directory from the `host machine`.
+
+> `node_modules` directory is not necessary in the `host machine` project directory, it increase the time to build the image. We can delete `node_modules` from project directory.
+
+If we again run the previous instruction to build the image, we will get much faster output,
+
+```bash
+docker build -f Dockerfile.dev .
+```
+
+### Run Container in Interactive Mode
+
+```bash
+docker run -it -p 3000:3000 IMAGE_ID
+```

@@ -115,6 +115,37 @@ docker build -f Dockerfile.dev .
 
 ### Run Container in Interactive Mode
 
+Now we can run a container from the image by
+
 ```bash
 docker run -it -p 3000:3000 IMAGE_ID
+```
+
+If we observe closely, we can notice, while we made changes in the codebase, the hot reloading is not working. The image was build on the snapshot of files. One way is after each changes in the code base we will rebuild the image. But this is a costly and inefficient approach. So we need to find a way to enable hot reload inside inside the image.
+
+### Enabling Hot Reload Using Docker Volume
+
+In the last section, we made changes in a file and the changes was not reflected in the container. Now we will figure out a way to solve the issue without stopping, rebuild and restarting the container.
+
+A docker volume essentially a mapping of directory between host machine and container.
+
+With docker volume, we can use the reference of local machine directory from the host machine. In this case, we do not copy the directory of the local machine in the container, instead, use the host machine directory by reference from container.
+
+To use the volume mapping we need to use the followings,
+
+```bash
+docker run -p 3000:3000 -v /app/node_modules -v ${pwd}:/app image_id
+```
+
+Here we have used two switches. Each switch has a `-v` flag which is used to set up a volume. The `${pwd}` is stands for `print working directory`, used to get the current application path.
+
+Here first switch is `-v /app/node_modules`, is not using the reference. Instead it says, not to map the `/app/node_modules` of the host machine.
+
+For the second switch, `-v ${pwd}:/app`, we are using the host machine volume. The `:` stands when we use host machine directory as reference in the docker.
+
+If the hot reload not work, need to create a `.env` in the `root directory` and need to add `CHOKIDAR_USEPOLLING=true`.
+The `.env` file should be
+
+```
+CHOKIDAR_USEPOLLING=true
 ```

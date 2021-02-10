@@ -149,3 +149,32 @@ The `.env` file should be
 ```
 CHOKIDAR_USEPOLLING=true
 ```
+
+### Shorthand of Docker CLI
+
+---
+
+The downside of previous run command is it is ridiculously long. We have to specify the `port-mapping`, `volume-mapping` and also the image id. With docker compose we can dramatically shorten the command to run the container in development phase. Let's create a `docker-compose` inside the project directory and encode the port mapping and volume mapping.
+
+First go to the project root directory and create a file named `docker-compose.yml`
+
+```bash
+touch docker-compose.yml
+```
+
+Our `docker-compose.yml` file will be like,
+
+```docker
+version: '3'
+services:
+  web:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - /app/node_modules
+      - .:/app
+```

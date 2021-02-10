@@ -79,7 +79,7 @@ Our `Dockerfile.dev` will be similar like the following.
 FROM node:alpine
 
 # Define working directory inside the container
-WORKDIR '/app'
+WORKDIR /app
 
 # Copy the package.json file to the project directory
 COPY package.json .
@@ -87,7 +87,7 @@ COPY package.json .
 RUN npm install
 
 # Copy all the source code from host machine to the container project directory
-COPY . .
+COPY . ./
 
 # Start up command of the container to run the server
 CMD ["npm", "run", "start"]
@@ -134,7 +134,7 @@ With docker volume, we can use the reference of local machine directory from the
 To use the volume mapping we need to use the followings,
 
 ```bash
-docker run -p 3000:3000 -v /app/node_modules -v ${pwd}:/app image_id
+docker run -p 3000:3000 -v /app/node_modules -v $(pwd):/app image_id
 ```
 
 Here we have used two switches. Each switch has a `-v` flag which is used to set up a volume. The `${pwd}` is stands for `print working directory`, used to get the current application path.

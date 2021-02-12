@@ -178,3 +178,177 @@ services:
       - /app/node_modules
       - .:/app
 ```
+
+### Executing Test Cases
+
+---
+
+Now we have a solid development infrastructure for the react application with docker container.
+
+Now we will focus on running the tests inside the container. First we run the tests to our development environment and then shift to `Travis CI`.
+
+The good things is, running test cases inside the container is very much straight forward.
+
+To do so, first let's build the image,
+
+```bash
+docker build -f Dockerfile.dev .
+```
+
+Now, to override our container startup command and replace it with the `npm run test`, we can do,
+
+```bash
+docker run image_id npm run test
+```
+
+This should run all the test cases for the app. To open the test runner in an interactive mode, we can utilize the `-it` flag.
+
+```bash
+docker run -it image_id npm run test
+```
+
+Now the test suite will run in the interactive mode.
+
+### Live Update Test Cases
+
+---
+
+If we run the tests in the container and update the test suite, we will notice the test cases changes does not impact inside the container.
+
+May be you got the reason. Here we created a special container by `docker build -f Dockerfile.dev .` that take the snapshot of the working files and put then inside the container. Now this special temporary container does not have volume mapping set up. So changes inside the files, does not impact the test cases changes.
+
+To resolve the issue we can take multiple approach. One is, start the container with `docker compose` and then run the `docker exec` to use the web service. Let's try this one,
+
+From one terminal, run the container with docker compose
+
+```bash
+docker-compose up
+```
+
+Now from another terminal, first take the running container id by
+
+```bash
+docker ps
+```
+
+From the out put we can get the `container_id` and run `npm run test` directly inside the container,
+
+```bash
+docker exec -it container_id npm run test
+```
+
+This should run the test suite in interactive mode with live update.
+
+Now this solution is not as good as it should be.
+
+Here in the `docker-compose.yml` file we will add another service, which will be solely responsible for run the test suite whenever we change the files.
+
+We already have a service named `web` that is responsible for run the web application. Our new service, we can named `tests` will be responsible for run the test suites. Except the `web` service, the `tests` service do not require the `port-mapping`, instead it needs to override the start up command. In this `tests` service the startup command should be `npm run test`.
+
+Our new `docker-compose.yml` file will be,
+
+```docker
+version: '3'
+services:
+  web:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - /app/node_modules
+      - .:/app
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - .:/app
+    command: ['npm', 'run', 'test']
+
+```
+
+Now run the container with a new build
+
+```bash
+docker-compose up --build
+```
+
+This will run both, the web application and the test suite.
+
+So bottom line is both approaches has some downside. For the first approach, we have to find out the running container id and remember the `docker exec` command.
+
+For the second approach, we get the test suite result in the docker log area. Also in this approach we can get the test suite in an interactive mode.
+
+### Nginx in Production Server
+
+---
+
+In development phase, we have a development server provided by the `create-react-app` that handle the request of port `3000`. In production, we need a web server whose sole purpose be to respond to browser request. In this case we can use an extremely popular web server `Nginx`. It's a minimal server basically do the routing.
+
+So we create a separate docker file, that will create a production version of web container. This production version of docker container will start an instance of Nginx. This `Nginx` server will be used to serve our `index.html` and `main.js` file.
+
+### Multi Step Docker Builds
+
+---
+
+To use `Nginx` in the production environment, we will need
+
+- Build Phase (To build the react app)
+  - Use `Node` base image
+  - Copy the package.json file
+  - Install dependencies
+  - Build the app by `npm run build`
+- Run Phase (To run the Nginx server)
+  - Use `Nginx` image
+  - Copy the build file generated in the `build phase`
+  - Start the `Nginx` server
+
+Let's create a docker file for our production environment,
+
+```bash
+touch Dockerfile
+```
+
+In the `Dockerfile` we will have two distinctly different section. One is for build the app and second is run the Nginx server with build files.
+
+> `Nginx` base image has already integrated a startup command. We do not explicitly start the `Nginx Server`.
+
+In the `Run Phage`, when we will use the `Nginx` using docker, it will automatically remove all files and folder from the `Build Phase` except the `build` directory. So our production image will be very small.
+
+Our `Dockerfile` will be,
+
+```docker
+FROM node:alpine
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx
+COPY --from=0 /app/build /usr/share/nginx/html
+```
+
+Now, let's build the image
+
+```bash
+docker build .
+```
+
+The end result of the `build` command will be an `image_id`.
+
+To to run the container, since `Nginx` is a web server, we have to do the port mapping. `Nginx` use `80` as default port.
+
+We can run the container using the following,
+
+```bash
+docker run -p 8080:80 image_id
+```
+
+Now, if we go to `http://localhost:8080`, we should see the react app running.
+
+So, now we got a docker application, that can be build our application and serve the application from a `Nginx` server. Now we need to ship all our work to the outside world, the deployment.

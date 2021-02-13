@@ -164,7 +164,7 @@ touch docker-compose.yml
 
 Our `docker-compose.yml` file will be like,
 
-```docker
+```yml
 version: '3'
 services:
   web:
@@ -247,7 +247,7 @@ We already have a service named `web` that is responsible for run the web applic
 
 Our new `docker-compose.yml` file will be,
 
-```docker
+```yml
 version: '3'
 services:
   web:
@@ -268,7 +268,6 @@ services:
       - /app/node_modules
       - .:/app
     command: ['npm', 'run', 'test']
-
 ```
 
 Now run the container with a new build
@@ -352,3 +351,92 @@ docker run -p 8080:80 image_id
 Now, if we go to `http://localhost:8080`, we should see the react app running.
 
 So, now we got a docker application, that can be build our application and serve the application from a `Nginx` server. Now we need to ship all our work to the outside world, the deployment.
+
+### Setting Up Git Repository
+
+---
+
+Let's create a git repository named `docker-react`.
+
+Please make sure the git repository is public. Off-course, the private repo will work but for private we have to set up couple of additional config.
+
+Push all your code base to the github master branch. Make sure in the github, your react-application source with `Dockerfile` exist. You can follow the commands,
+
+```bash
+git init
+git add .
+git commit -m 'initial commit'
+git remote add origin remote_git_repository_address
+git push origin master
+```
+
+### Setting Up Travis CI
+
+---
+
+We have not talked about `Travis CI` a lot. `Travis CI` essentially set a sky limit for our code base, we can do whatever we want.
+
+When we push some changes to the github, github taps the `Travis CI` that some code changes. In this case, `Travis CI` took the code base and do whatever we are asked to. Some developer use `Travis CI` for test the code base after any changes, someone use the `Travis CI` to deploy the codebase. In our case, we will use `Travis CI` for both, `Test the codebase` and `Deploy to the AWS`.
+
+To set up `Travis CI`,
+
+- Sign in `Travis CI` with your github account (For simplicity)
+- Enable Github App (This will load all your github repo in `Travis CI` dashboard)
+- Find `docker-react` and enable tracking by tapping the switch button
+
+> `Travis CI` ui is being changed time to time. If you have trouble finding the green switch button, please [here](https://travis-ci.org/account/repositories) and tap the button
+
+Now we have to explicitly tell `Travis CI` what to do when a code base is being changed. For now we ignore the `AWS Deployment` and focus on testing.
+
+We essentially tell `Travis CI` how to start the `Docker`, run the test suite and interpret the test result. In order to do so, we will require a file `.travis.yml` in the project root directory.
+
+Let's create the file `.travis.yml`,
+
+```bash
+touch .travis.yml
+```
+
+In the `.travis.yml` we make sure the `super user` privilege is being configured. We require the `super user` privilege for running the docker.
+
+We also specify that, we are using the `docker`, so `Travis CI` will bring a copy of the `Docker`.
+
+Finally, we build an image out of the `Dockerfile.dev` to run our test suite.
+
+In our local machine, after we build the `image` we used to get the `image_id` and used the `image_id` to run the container. In `Travis CI`, we can not manually copy and paste the `image_id`, so we can utilize the use of `tagging`.
+
+Our `.travis.yml` file should be like the following,
+
+```yml
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t docker_username/github_repo_name -f Dockerfile.dev
+
+script:
+  - docker run -e CI=true docker_username/github_repo_name npm run test -- --coverage
+```
+
+> As tag, we can use any name. But its a good practice to use the convention `docker_username`/`github_repo_name`
+
+> Default behaviour of `Jest` is run the test for the first time and bring an interactive terminal to run test according to developer input. With `-- -- coverage` we can change that default behaviour and the will run once and return status code and terminate.
+
+> When test results return with status code `0`, means test coverage is as expected
+
+Now push the changed codebase to the github repository.
+
+```bash
+git add .travis.yml
+git commit -m 'Added travis file'
+git push origin master
+```
+
+This should trigger the test in the `Travis CI`. In the dashboard, inside `react-docker` application, we should see the test suite running and should get passed all the tests.
+
+Now, we have a pipeline in place to automatically watch out our github repository for changes and pull down the source code to run the tests and report back if everything is alright.
+
+### AWS Elastic Beanstalk
+
+---

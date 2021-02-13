@@ -437,6 +437,96 @@ This should trigger the test in the `Travis CI`. In the dashboard, inside `react
 
 Now, we have a pipeline in place to automatically watch out our github repository for changes and pull down the source code to run the tests and report back if everything is alright.
 
-### AWS Elastic Beanstalk
+### Set Up AWS Elastic Beanstalk
 
 ---
+
+Elastic Beanstalk is the easiest way to run `Single Container` application in `AWS Infrastructure`.
+
+When we deploy a code base to `AWS Beanstalk` using `Travis CI`, in background, the `Travis CI` upload a zipped version of the code to the `S3 Bucket` and tap the `Beanstalk` to notify there's a new version of code is being pushed. Then the `AWS Beanstalk` pull the codebase from the `S3 Bucket` and redeploy. And good things is, when we create a `AWS Elastic Beanstalk` environment, this `S3 Bucket` is being automatically created.
+
+`AWS` recently update the `AWS Elastic Beanstalk` that can work with `docker compose`. By default, when platform branch is `Docker Running on 64bit Linux`, then the new feature with docker-compose works. In our case we will make use vanilla `Dockerfile`.
+
+When we set a `docker` environment in the `AWS Beanstalk`, `Beanstalk` create a virtual machine that's sole purpose is to run the docker container we provide. In the `AWS Beanstalk` there is already an built in `load-balancer`. So whenever the traffic flows increase, the `AWS Beanstalk` automatically increase the number of `Virtual Machine`, as well as, our container and react-app inside the container.
+
+Login to your `AWS` account and select the `Elastic Beanstalk` service.
+
+Now create an application with the following config,
+
+- Application name can be anything, I am using `docker-react`
+- Platform should be `Docker`
+- Platform branch should be `Docker Running on 64bit Amazon Linux`
+- Platform version as `AWS Recommended`, I am using `2.16.4`
+
+Creating the application environment might take couple of minutes. After the environment being created, the environment will be listed in the `environment` section.
+
+### Travis Config AWS Deployment
+
+---
+
+In the deployment config we will require the following config,
+
+- `provider`, should be `elasticbeanstalk`, already configured and heavy lifting by the `Travis CI`
+- `region`, Where the `AWS Elastic Beanstalk` is being created
+- `app`, our `Elastic Beanstalk` app name
+- `env`, our `Elastic Beanstalk` environment name
+- `bucket_name`, automatically generated bucket name by the `Elastic Beanstalk`
+- `bucket_path`, same as the `app` name
+- `on -> branch`, on which branch code changes, we should re-deploy the code base
+- `credentials`, to get the credentials to access `Elastic Beanstalk` by `Travis CI`, we have to create a new IAM user with full programmatic access to `Elastic Beanstalk`. For security purpose, we will use the `Travis CI` environment variables to store our aws access key and secret.
+
+Our new `.travis.yml` file should be,
+
+```yml
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t bmshamsnahid/docker-react -f Dockerfile.dev .
+
+script:
+  - docker run -e CI=true bmshamsnahid/docker-react npm run test -- --coverage
+
+deploy:
+  provider: elasticbeanstalk
+  region: 'ap-south-1'
+  app: 'docker-react'
+  env: 'Dockerreact-env'
+  bucket_name: 'elasticbeanstalk-ap-south-1-366735605679'
+  bucket_path: 'docker-react'
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+```
+
+> In the deploy config, the path name of the `S3` bucket should be same as the app name.
+
+In the `Elastic Beanstalk`, it should open port `80` for `Nginx`. We have to specify the port in the `Dockerfile`. We can expose a port in the `Elastic Beanstalk` with `Dockerfile` by `EXPOSE 80`. Our new `Dockerfile` with updated configuration should be
+
+```docker
+FROM node:alpine
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx
+EXPOSE 80
+COPY --from=0 /app/build /usr/share/nginx/html
+```
+
+Now, if we push the changes to the `github` the application should be deployed to the `AWS Elastic Beanstalk`.
+
+From `Elastic Beanstalk` we can get the web url and access our react application.
+
+Now we have a complete CI/CD with docker, github, Travis CI and AWS Beanstalk. In a team, engineers make commit in the feature branch. Other engineers will review and merge the code base to master branch. The moment, codebase is being merged to the master branch, the CI/CD will be triggered and make the deployment.
+
+### Cleanup
+
+---
+
+For the `AWS Beanstalk`, when we create a environment, the `AWS Beanstalk` create a `EC2 Instance` internally. This `EC2 Instance` is costing money. So after we are done our experiments, we need to delete the `AWS Beanstalk` application. We can delete the `Beanstalk Application` from the dashboard.

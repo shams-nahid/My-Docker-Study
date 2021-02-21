@@ -1,4 +1,4 @@
-## Production App Workflow With Docker
+## Single Container Workflow
 
 Let's use docker in a production type environment. The important thing to keep in mind, we first explain the workflow without docker. Instead we discuss outside services that we are going to use to set up this development workflow. Once we get the bird view of the workflow and get the core design behind the workflow, then we introduce the docker and find how docker can facilitate everything.
 
@@ -165,7 +165,7 @@ touch docker-compose.yml
 Our `docker-compose.yml` file will be like,
 
 ```yml
-version: '3'
+version: "3"
 services:
   web:
     stdin_open: true
@@ -173,7 +173,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - '3000:3000'
+      - "3000:3000"
     volumes:
       - /app/node_modules
       - .:/app
@@ -248,7 +248,7 @@ We already have a service named `web` that is responsible for run the web applic
 Our new `docker-compose.yml` file will be,
 
 ```yml
-version: '3'
+version: "3"
 services:
   web:
     stdin_open: true
@@ -256,7 +256,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - '3000:3000'
+      - "3000:3000"
     volumes:
       - /app/node_modules
       - .:/app
@@ -267,7 +267,7 @@ services:
     volumes:
       - /app/node_modules
       - .:/app
-    command: ['npm', 'run', 'test']
+    command: ["npm", "run", "test"]
 ```
 
 Now run the container with a new build
@@ -491,11 +491,11 @@ script:
 
 deploy:
   provider: elasticbeanstalk
-  region: 'ap-south-1'
-  app: 'docker-react'
-  env: 'Dockerreact-env'
-  bucket_name: 'elasticbeanstalk-ap-south-1-366735605679'
-  bucket_path: 'docker-react'
+  region: "ap-south-1"
+  app: "docker-react"
+  env: "Dockerreact-env"
+  bucket_name: "elasticbeanstalk-ap-south-1-366735605679"
+  bucket_path: "docker-react"
   on:
     branch: master
   access_key_id: $AWS_ACCESS_KEY

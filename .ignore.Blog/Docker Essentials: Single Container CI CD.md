@@ -1,33 +1,29 @@
 ## Docker Essential: Single Container CI/CD
 
-Let's use docker in a production type environment. The important thing to keep in mind, we first explain the workflow without docker. Instead we discuss outside services that we are going to use to set up this development workflow. Once we get the bird view of the workflow and get the core design behind the workflow, then we introduce the docker and find how docker can facilitate everything.
+It's time to put an docker application in the production environment along with CI/CD. First we look at the step by step process without docker. Once we get the bird view of the workflow and get the core design behind the workflow, then we introduce the docker and find how docker can facilitate everything.
 
-We will create an application that will use docker and eventually push the application to `AWS`. Our workflow is going to be
+To implement CI/CD, along with docker we will use `Travis CI`, `Nginx server` and `Elastic Beanstalk`.
 
-- Develop
-- Testing
-- Deployment
-
-Also for any changes, we will repeat the workflow again.
+We will create an application that will use docker and eventually push the application to `AWS Elastic Beanstalk`. This `CI/CD` is separated in 3 phase,
 
 **Development Phase :** Our dev workflow is starting by creating a git repository. This git repository is going to be the center of coordination of all the code we will write. Out git repository will have two types of branch, master and feature branch. We make changes on the feature branch. By filing a PR we will merge the feature branch to master branch. When we do the PR there will be a series of actions, defining how we govern the codebase. The master branch will contain the very clean copy of our code base.
 
 **Test Phase :** As soon as we make the PR, the `Travis CI` will pull the new and updated code and run the test. If all the tests executed successfully, then we will merge the code to the master branch.
 
-**Production Phase :** After merging the feature branch, We then again push the code to `Travis CI` and run tests of the code. Any changes on the master branch will eventually and automatically be hosted in the `AWS Beanstalk`.
+**Production Phase :** After merging the feature branch, `Travis CI` again pull the codebase and run tests of the code. Any changes on the master branch will eventually and automatically be hosted in the `AWS Beanstalk`.
 
-Now we need to find out how `docker` fits in this place. To execute this workflow, we do not need to make use of `Docker`. But using docker will make the workflow lot lot easier. Thats the soul purpose of docker. It's not necessarily a requirement, it just make developer life easier.
+Now we need to find out, how `docker` fits in this place. To execute this workflow, we do not need to make use of `Docker`. But using docker will make the workflow a lot lot easier. Thats the soul purpose of docker.
 
-Docker is not the focus here, it's more of using these 3rd party services (like, Github, Travis CI, AWS Beanstalk) with docker.
+> `Docker` is not necessarily a requirement, it just make the developers life easier. Again, `Docker` is not the focus here, it's more of utilizing 3rd party services (like, `Github`, `Travis CI`, `Nginx`, `AWS Beanstalk`) with docker.
 
 ### Generating a Project
 
 ---
 
-We will use a `react` for simplicity. To create a react project, make sure `node.js` is installed in your system. Then create the project named `frontend` by the followings,
+We will use a `react` app for simplicity. To create a react project, make sure `node.js` is installed in your system. Then create the project named `frontend` by the followings,
 
 ```bash
-npm create-react-app frontend
+npx create-react-app ix-docker-react
 ```
 
 This will create the react project and install all the necessary dependencies.
@@ -35,7 +31,7 @@ This will create the react project and install all the necessary dependencies.
 Now go to the project directory,
 
 ```bash
-cd frontend
+cd ix-docker-react
 ```
 
 To run the test in local machine, we can use
@@ -60,7 +56,7 @@ npm run start
 
 ---
 
-First go to the project directory. Here we will create a `Dockerfile` named `Dockerfile.dev`. The purpose of using `.dev` with the `Dockerfile` is to make clear that, this docker file is only using in the development environment.
+First go to the project directory. Here we will create a `Dockerfile` named `Dockerfile.dev`. The purpose of using `.dev` with the `Dockerfile` is to make clear that, this docker file will only be using in the development phase.
 
 In future, we will use another `Dockerfile` with simply name `Dockerfile`, without any extension for our production environment.
 

@@ -121,11 +121,11 @@ If we observe closely, we can notice, while we made changes in the codebase, the
 
 ### Enabling Hot Reload Using Docker Volume
 
-In the last section, we made changes in a file and the changes was not reflected in the container. Now we will figure out a way to solve the issue without stopping, rebuild and restarting the container.
+In the last section, if we made changes in a source file and the changes was not reflected in the container. Now we will figure out a way to solve the issue without stopping, rebuild and restarting the container.
 
-A docker volume essentially a mapping of directory between host machine and container.
+A docker volume is essentially a mapping of directory between host machine and container.
 
-With docker volume, we can use the reference of local machine directory from the host machine. In this case, we do not copy the directory of the local machine in the container, instead, use the host machine directory by reference from container.
+With docker volume mapping, we can use the reference of local machine directory from the host machine. In this case, we do not copy the source directory of the local machine in the container, instead, use the host machine directory by reference from container.
 
 To use the volume mapping we need to use the followings,
 
@@ -138,6 +138,20 @@ Here we have used two switches. Each switch has a `-v` flag which is used to set
 Here first switch is `-v /app/node_modules`, is not using the reference. Instead it says, not to map the `/app/node_modules` of the host machine.
 
 For the second switch, `-v ${pwd}:/app`, we are using the host machine volume. The `:` stands when we use host machine directory as reference in the docker.
+
+If you face any access error like the following,
+
+```
+EACCES: permission denied, mkdir '/app/node_modules/.cache'
+```
+
+Then resolve the permission issue by running from the project root directory,
+
+```bash
+sudo chmod a+w node_modules -R
+```
+
+Now rebuild the image and run again.
 
 If the hot reload not work, need to create a `.env` in the `root directory` and need to add `CHOKIDAR_USEPOLLING=true`.
 The `.env` file should be

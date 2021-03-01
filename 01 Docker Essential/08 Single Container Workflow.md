@@ -179,17 +179,26 @@ services:
       - .:/app
 ```
 
+With docker compose, from now on, we can simple run the application by,
+
+```bash
+docker-compose up
+```
+
 ### Executing Test Cases
 
 ---
 
 Now we have a solid development infrastructure for the react application with docker container.
 
-Now we will focus on running the tests inside the container. First we run the tests to our development environment and then shift to `Travis CI`.
+It's time to focus on running the tests inside the container. First we run the tests to our development environment and then shift to `Travis CI`.
 
-The good things is, running test cases inside the container is very much straight forward.
+The good things is, running test cases inside the container is very much straight forward. To run the test cases, we have to follow two steps,
 
-To do so, first let's build the image,
+1. Create the image out of the `Dockerfile`
+2. Override the startup command with the test command
+
+First let's build the image,
 
 ```bash
 docker build -f Dockerfile.dev .
@@ -286,7 +295,7 @@ For the second approach, we get the test suite result in the docker log area. Al
 
 ---
 
-In development phase, we have a development server provided by the `create-react-app` that handle the request of port `3000`. In production, we need a web server whose sole purpose be to respond to browser request. In this case we can use an extremely popular web server `Nginx`. It's a minimal server basically do the routing.
+In development phase, we have a development server provided by the `create-react-app` that handle the request of port `3000`. In production, we need a web server whose sole purpose will be to respond to browser request. In this case, we can use an extremely popular web server `Nginx`. It's a minimal server basically do the routing.
 
 So we create a separate docker file, that will create a production version of web container. This production version of docker container will start an instance of Nginx. This `Nginx` server will be used to serve our `index.html` and `main.js` file.
 
@@ -298,7 +307,7 @@ To use `Nginx` in the production environment, we will need
 
 - Build Phase (To build the react app)
   - Use `Node` base image
-  - Copy the package.json file
+  - Copy the `package.json` file
   - Install dependencies
   - Build the app by `npm run build`
 - Run Phase (To run the Nginx server)
@@ -356,7 +365,7 @@ So, now we got a docker application, that can be build our application and serve
 
 ---
 
-Let's create a git repository named `docker-react`.
+Let's create a git repository named `ix-docker-react`.
 
 Please make sure the git repository is public. Off-course, the private repo will work but for private we have to set up couple of additional config.
 
@@ -374,17 +383,17 @@ git push origin master
 
 ---
 
-We have not talked about `Travis CI` a lot. `Travis CI` essentially set a sky limit for our code base, we can do whatever we want.
+We have not discussed about `Travis CI` a lot. `Travis CI` essentially set a sky limit for our code base, we can do whatever we want.
 
-When we push some changes to the github, github taps the `Travis CI` that some code changes. In this case, `Travis CI` took the code base and do whatever we are asked to. Some developer use `Travis CI` for test the code base after any changes, someone use the `Travis CI` to deploy the codebase. In our case, we will use `Travis CI` for both, `Test the codebase` and `Deploy to the AWS`.
+When we push some changes to the github, github taps the `Travis CI` that some code changes. In this case, `Travis CI` pull the code base and do whatever we are asked to. Some developer use `Travis CI` for test the code base after any changes, someone use the `Travis CI` to deploy the codebase. In our case, we will use `Travis CI` for both, `Test the codebase` and `Deploy to the AWS`.
 
 To set up `Travis CI`,
 
 - Sign in `Travis CI` with your github account (For simplicity)
 - Enable Github App (This will load all your github repo in `Travis CI` dashboard)
-- Find `docker-react` and enable tracking by tapping the switch button
+- Find `ix-docker-react` and enable tracking by tapping the switch button
 
-> `Travis CI` ui is being changed time to time. If you have trouble finding the green switch button, please [here](https://travis-ci.org/account/repositories) and tap the button
+> `Travis CI` ui is being changed time to time. If you have trouble finding the green switch button, please find legacy site [here](https://travis-ci.org/account/repositories) and tap the button
 
 Now we have to explicitly tell `Travis CI` what to do when a code base is being changed. For now we ignore the `AWS Deployment` and focus on testing.
 
@@ -447,13 +456,13 @@ When we deploy a code base to `AWS Beanstalk` using `Travis CI`, in background, 
 
 `AWS` recently update the `AWS Elastic Beanstalk` that can work with `docker compose`. By default, when platform branch is `Docker Running on 64bit Linux`, then the new feature with docker-compose works. In our case we will make use vanilla `Dockerfile`.
 
-When we set a `docker` environment in the `AWS Beanstalk`, `Beanstalk` create a virtual machine that's sole purpose is to run the docker container we provide. In the `AWS Beanstalk` there is already an built in `load-balancer`. So whenever the traffic flows increase, the `AWS Beanstalk` automatically increase the number of `Virtual Machine`, as well as, our container and react-app inside the container.
+When we set a `docker` environment in the `AWS Beanstalk`, `AWS Beanstalk` create a virtual machine that's sole purpose is to run the docker container we provide. In the `AWS Beanstalk` there is already an built in `load-balancer`. So whenever the traffic flows increase, the `AWS Beanstalk` automatically increase the number of `Virtual Machine`, as well as, our container and react-app inside the container.
 
 Login to your `AWS` account and select the `Elastic Beanstalk` service.
 
 Now create an application with the following config,
 
-- Application name can be anything, I am using `docker-react`
+- Application name can be anything, I am using `ix-docker-react`
 - Platform should be `Docker`
 - Platform branch should be `Docker Running on 64bit Amazon Linux`
 - Platform version as `AWS Recommended`, I am using `2.16.4`
@@ -464,7 +473,7 @@ Creating the application environment might take couple of minutes. After the env
 
 ---
 
-In the deployment config we will require the following config,
+For deployment, we will require the following config,
 
 - `provider`, should be `elasticbeanstalk`, already configured and heavy lifting by the `Travis CI`
 - `region`, Where the `AWS Elastic Beanstalk` is being created
@@ -484,18 +493,18 @@ services:
   - docker
 
 before_install:
-  - docker build -t bmshamsnahid/docker-react -f Dockerfile.dev .
+  - docker build -t docker_user_name/ix-docker-react -f Dockerfile.dev .
 
 script:
-  - docker run -e CI=true bmshamsnahid/docker-react npm run test -- --coverage
+  - docker run -e CI=true docker_user_name/ix-docker-react npm run test -- --coverage
 
 deploy:
   provider: elasticbeanstalk
   region: "ap-south-1"
-  app: "docker-react"
+  app: "ix-docker-react"
   env: "Dockerreact-env"
   bucket_name: "elasticbeanstalk-ap-south-1-366735605679"
-  bucket_path: "docker-react"
+  bucket_path: "ix-docker-react"
   on:
     branch: master
   access_key_id: $AWS_ACCESS_KEY
@@ -523,7 +532,7 @@ Now, if we push the changes to the `github` the application should be deployed t
 
 From `Elastic Beanstalk` we can get the web url and access our react application.
 
-Now we have a complete CI/CD with docker, github, Travis CI and AWS Beanstalk. In a team, engineers make commit in the feature branch. Other engineers will review and merge the code base to master branch. The moment, codebase is being merged to the master branch, the CI/CD will be triggered and make the deployment.
+Now we have a complete `CI/CD` with `docker`, `github`, `Travis CI` and `AWS Beanstalk`. In a team, engineers make commit in the feature branch. Other engineers will review and merge the code base to master branch. The moment, codebase is being merged to the master branch, the `CI/CD` will be triggered and make the deployment.
 
 ### Cleanup
 

@@ -8,6 +8,7 @@ runServer({
     ".ignore.Blog",
     "node_modules",
     "resource",
+    "ui",
     ".gitignore",
     "package.json",
     "server.js",

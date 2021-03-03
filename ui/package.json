@@ -21,7 +21,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy-s3": "aws s3 cp build s3://advanced-js.shams-nahid.com/ --recursive"
+    "deploy-s3": "aws s3 cp build s3://docker-study.shams-nahid.com/ --recursive"
   },
   "eslintConfig": {
     "extends": [

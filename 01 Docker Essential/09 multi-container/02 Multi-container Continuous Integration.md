@@ -1,12 +1,12 @@
-## Multi-container Continuous Integration
+## Managing multiple containers in local environment
 
 ### Approach
 
 ---
 
-We already got our development environment for multiple environment. To implement the development environment, we can do the following steps,
+We already got our development environment for multiple environment. To implement the continuous integration, we can do the following steps,
 
-- Push the code to `Github`
+- Make sure, codebase is already in the `Github` repository
 - `Travis CI` will pull the code
 - `Travis CI` will build the test image, run the tests and remove the test image
 - `Travis CI` will build the production image
@@ -125,7 +125,7 @@ COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/build /usr/share/nginx/html
 ```
 
-In the react application, if we try to run the test, it will through error. The reason is in the test file `App.test.js`, we are testing if the `App` component can render without any crash.
+In the react application, if we try to run the test, it will throw an error. The reason is in the test file `App.test.js`, we are testing if the `App` component can render without any crash.
 
 This test flow do the followings,
 
@@ -144,10 +144,6 @@ expect(linkElement).toBeInTheDocument();
 Our `App.test.js` file will look like the following,
 
 ```js
-import React from "react";
-import { render } from "@testing-library/react";
-import App from "./App";
-
 test("renders learn react link", () => {});
 ```
 
@@ -181,21 +177,21 @@ services:
   - docker
 
 before_install:
-  - docker build -t bmshamsnahid/react-test -f ./client/Dockerfile.dev ./client
+  - docker build -t DOCKER_HUB_USER_NAME/react-test -f ./client/Dockerfile.dev ./client
 
 script:
   - docker run -e CI=true USERNAME/react-test npm test -- --coverage
 
 after_success:
-  - docker build -t bmshamsnahid/multi-client ./client
-  - docker build -t bmshamsnahid/multi-nginx ./nginx
-  - docker build -t bmshamsnahid/multi-server ./server
-  - docker build -t bmshamsnahid/multi-worker ./worker
+  - docker build -t DOCKER_HUB_USER_NAME/multi-client ./client
+  - docker build -t DOCKER_HUB_USER_NAME/multi-nginx ./nginx
+  - docker build -t DOCKER_HUB_USER_NAME/multi-server ./server
+  - docker build -t DOCKER_HUB_USER_NAME/multi-worker ./worker
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker push bmshamsnahid/multi-client
-  - docker push bmshamsnahid/multi-nginx
-  - docker push bmshamsnahid/multi-server
-  - docker push bmshamsnahid/multi-worker
+  - docker push DOCKER_HUB_USER_NAME/multi-client
+  - docker push DOCKER_HUB_USER_NAME/multi-nginx
+  - docker push DOCKER_HUB_USER_NAME/multi-server
+  - docker push DOCKER_HUB_USER_NAME/multi-worker
 ```
 
 To access the docker hub to upload the image, we need to put the credentials in the `Travis CI` environment section.

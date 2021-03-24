@@ -1,4 +1,4 @@
-## Multi-container development environment
+# Managing multiple containers in local environments
 
 Today we are going to make an app that is responsible to generate fibonacci number. But instead of writing a simple method, we will take it to next level and put couple of complexity layer to serve our sole purpose, multi container CI/CD.
 

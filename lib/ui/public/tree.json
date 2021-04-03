@@ -1,0 +1,642 @@
+[
+  {
+    "type": "folder",
+    "name": ".git",
+    "children": [
+      {
+        "type": "file",
+        "name": "COMMIT_EDITMSG",
+        "children": null,
+        "path": ".//.git/COMMIT_EDITMSG",
+        "content": "Added notes on sprint planning\n"
+      },
+      {
+        "type": "file",
+        "name": "HEAD",
+        "children": null,
+        "path": ".//.git/HEAD",
+        "content": "ref: refs/heads/master\n"
+      },
+      {
+        "type": "folder",
+        "name": "branches",
+        "path": ".//.git/branches",
+        "content": ""
+      },
+      {
+        "type": "file",
+        "name": "config",
+        "children": null,
+        "path": ".//.git/config",
+        "content": "[core]\n\trepositoryformatversion = 0\n\tfilemode = true\n\tbare = false\n\tlogallrefupdates = true\n[remote \"origin\"]\n\turl = https://github.com/bmshamsnahid/My-SCRUM-Study.git\n\tfetch = +refs/heads/*:refs/remotes/origin/*\n"
+      },
+      {
+        "type": "file",
+        "name": "description",
+        "children": null,
+        "path": ".//.git/description",
+        "content": "Unnamed repository; edit this file 'description' to name the repository.\n"
+      },
+      {
+        "type": "folder",
+        "name": "hooks",
+        "children": [
+          {
+            "type": "file",
+            "name": "applypatch-msg.sample",
+            "children": null,
+            "path": ".//.git/hooks/applypatch-msg.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to check the commit log message taken by\n# applypatch from an e-mail message.\n#\n# The hook should exit with non-zero status after issuing an\n# appropriate message if it wants to stop the commit.  The hook is\n# allowed to edit the commit message file.\n#\n# To enable this hook, rename this file to \"applypatch-msg\".\n\n. git-sh-setup\ncommitmsg=\"$(git rev-parse --git-path hooks/commit-msg)\"\ntest -x \"$commitmsg\" && exec \"$commitmsg\" ${1+\"$@\"}\n:\n"
+          },
+          {
+            "type": "file",
+            "name": "commit-msg.sample",
+            "children": null,
+            "path": ".//.git/hooks/commit-msg.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to check the commit log message.\n# Called by \"git commit\" with one argument, the name of the file\n# that has the commit message.  The hook should exit with non-zero\n# status after issuing an appropriate message if it wants to stop the\n# commit.  The hook is allowed to edit the commit message file.\n#\n# To enable this hook, rename this file to \"commit-msg\".\n\n# Uncomment the below to add a Signed-off-by line to the message.\n# Doing this in a hook is a bad idea in general, but the prepare-commit-msg\n# hook is more suited to it.\n#\n# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\\(.*>\\).*$/Signed-off-by: \\1/p')\n# grep -qs \"^$SOB\" \"$1\" || echo \"$SOB\" >> \"$1\"\n\n# This example catches duplicate Signed-off-by lines.\n\ntest \"\" = \"$(grep '^Signed-off-by: ' \"$1\" |\n\t sort | uniq -c | sed -e '/^[ \t]*1[ \t]/d')\" || {\n\techo >&2 Duplicate Signed-off-by lines.\n\texit 1\n}\n"
+          },
+          {
+            "type": "file",
+            "name": "fsmonitor-watchman.sample",
+            "children": null,
+            "path": ".//.git/hooks/fsmonitor-watchman.sample",
+            "content": "#!/usr/bin/perl\n\nuse strict;\nuse warnings;\nuse IPC::Open2;\n\n# An example hook script to integrate Watchman\n# (https://facebook.github.io/watchman/) with git to speed up detecting\n# new and modified files.\n#\n# The hook is passed a version (currently 1) and a time in nanoseconds\n# formatted as a string and outputs to stdout all files that have been\n# modified since the given time. Paths must be relative to the root of\n# the working tree and separated by a single NUL.\n#\n# To enable this hook, rename this file to \"query-watchman\" and set\n# 'git config core.fsmonitor .git/hooks/query-watchman'\n#\nmy ($version, $time) = @ARGV;\n\n# Check the hook interface version\n\nif ($version == 1) {\n\t# convert nanoseconds to seconds\n\t# subtract one second to make sure watchman will return all changes\n\t$time = int ($time / 1000000000) - 1;\n} else {\n\tdie \"Unsupported query-fsmonitor hook version '$version'.\\n\" .\n\t    \"Falling back to scanning...\\n\";\n}\n\nmy $git_work_tree;\nif ($^O =~ 'msys' || $^O =~ 'cygwin') {\n\t$git_work_tree = Win32::GetCwd();\n\t$git_work_tree =~ tr/\\\\/\\//;\n} else {\n\trequire Cwd;\n\t$git_work_tree = Cwd::cwd();\n}\n\nmy $retry = 1;\n\nlaunch_watchman();\n\nsub launch_watchman {\n\n\tmy $pid = open2(\\*CHLD_OUT, \\*CHLD_IN, 'watchman -j --no-pretty')\n\t    or die \"open2() failed: $!\\n\" .\n\t    \"Falling back to scanning...\\n\";\n\n\t# In the query expression below we're asking for names of files that\n\t# changed since $time but were not transient (ie created after\n\t# $time but no longer exist).\n\t#\n\t# To accomplish this, we're using the \"since\" generator to use the\n\t# recency index to select candidate nodes and \"fields\" to limit the\n\t# output to file names only.\n\n\tmy $query = <<\"\tEND\";\n\t\t[\"query\", \"$git_work_tree\", {\n\t\t\t\"since\": $time,\n\t\t\t\"fields\": [\"name\"]\n\t\t}]\n\tEND\n\n\tprint CHLD_IN $query;\n\tclose CHLD_IN;\n\tmy $response = do {local $/; <CHLD_OUT>};\n\n\tdie \"Watchman: command returned no output.\\n\" .\n\t    \"Falling back to scanning...\\n\" if $response eq \"\";\n\tdie \"Watchman: command returned invalid output: $response\\n\" .\n\t    \"Falling back to scanning...\\n\" unless $response =~ /^\\{/;\n\n\tmy $json_pkg;\n\teval {\n\t\trequire JSON::XS;\n\t\t$json_pkg = \"JSON::XS\";\n\t\t1;\n\t} or do {\n\t\trequire JSON::PP;\n\t\t$json_pkg = \"JSON::PP\";\n\t};\n\n\tmy $o = $json_pkg->new->utf8->decode($response);\n\n\tif ($retry > 0 and $o->{error} and $o->{error} =~ m/unable to resolve root .* directory (.*) is not watched/) {\n\t\tprint STDERR \"Adding '$git_work_tree' to watchman's watch list.\\n\";\n\t\t$retry--;\n\t\tqx/watchman watch \"$git_work_tree\"/;\n\t\tdie \"Failed to make watchman watch '$git_work_tree'.\\n\" .\n\t\t    \"Falling back to scanning...\\n\" if $? != 0;\n\n\t\t# Watchman will always return all files on the first query so\n\t\t# return the fast \"everything is dirty\" flag to git and do the\n\t\t# Watchman query just to get it over with now so we won't pay\n\t\t# the cost in git to look up each individual file.\n\t\tprint \"/\\0\";\n\t\teval { launch_watchman() };\n\t\texit 0;\n\t}\n\n\tdie \"Watchman: $o->{error}.\\n\" .\n\t    \"Falling back to scanning...\\n\" if $o->{error};\n\n\tbinmode STDOUT, \":utf8\";\n\tlocal $, = \"\\0\";\n\tprint @{$o->{files}};\n}\n"
+          },
+          {
+            "type": "file",
+            "name": "post-update.sample",
+            "children": null,
+            "path": ".//.git/hooks/post-update.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to prepare a packed repository for use over\n# dumb transports.\n#\n# To enable this hook, rename this file to \"post-update\".\n\nexec git update-server-info\n"
+          },
+          {
+            "type": "file",
+            "name": "pre-applypatch.sample",
+            "children": null,
+            "path": ".//.git/hooks/pre-applypatch.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to verify what is about to be committed\n# by applypatch from an e-mail message.\n#\n# The hook should exit with non-zero status after issuing an\n# appropriate message if it wants to stop the commit.\n#\n# To enable this hook, rename this file to \"pre-applypatch\".\n\n. git-sh-setup\nprecommit=\"$(git rev-parse --git-path hooks/pre-commit)\"\ntest -x \"$precommit\" && exec \"$precommit\" ${1+\"$@\"}\n:\n"
+          },
+          {
+            "type": "file",
+            "name": "pre-commit.sample",
+            "children": null,
+            "path": ".//.git/hooks/pre-commit.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to verify what is about to be committed.\n# Called by \"git commit\" with no arguments.  The hook should\n# exit with non-zero status after issuing an appropriate message if\n# it wants to stop the commit.\n#\n# To enable this hook, rename this file to \"pre-commit\".\n\nif git rev-parse --verify HEAD >/dev/null 2>&1\nthen\n\tagainst=HEAD\nelse\n\t# Initial commit: diff against an empty tree object\n\tagainst=$(git hash-object -t tree /dev/null)\nfi\n\n# If you want to allow non-ASCII filenames set this variable to true.\nallownonascii=$(git config --bool hooks.allownonascii)\n\n# Redirect output to stderr.\nexec 1>&2\n\n# Cross platform projects tend to avoid non-ASCII filenames; prevent\n# them from being added to the repository. We exploit the fact that the\n# printable range starts at the space character and ends with tilde.\nif [ \"$allownonascii\" != \"true\" ] &&\n\t# Note that the use of brackets around a tr range is ok here, (it's\n\t# even required, for portability to Solaris 10's /usr/bin/tr), since\n\t# the square bracket bytes happen to fall in the designated range.\n\ttest $(git diff --cached --name-only --diff-filter=A -z $against |\n\t  LC_ALL=C tr -d '[ -~]\\0' | wc -c) != 0\nthen\n\tcat <<\\EOF\nError: Attempt to add a non-ASCII file name.\n\nThis can cause problems if you want to work with people on other platforms.\n\nTo be portable it is advisable to rename the file.\n\nIf you know what you are doing you can disable this check using:\n\n  git config hooks.allownonascii true\nEOF\n\texit 1\nfi\n\n# If there are whitespace errors, print the offending file names and fail.\nexec git diff-index --check --cached $against --\n"
+          },
+          {
+            "type": "file",
+            "name": "pre-merge-commit.sample",
+            "children": null,
+            "path": ".//.git/hooks/pre-merge-commit.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to verify what is about to be committed.\n# Called by \"git merge\" with no arguments.  The hook should\n# exit with non-zero status after issuing an appropriate message to\n# stderr if it wants to stop the merge commit.\n#\n# To enable this hook, rename this file to \"pre-merge-commit\".\n\n. git-sh-setup\ntest -x \"$GIT_DIR/hooks/pre-commit\" &&\n        exec \"$GIT_DIR/hooks/pre-commit\"\n:\n"
+          },
+          {
+            "type": "file",
+            "name": "pre-push.sample",
+            "children": null,
+            "path": ".//.git/hooks/pre-push.sample",
+            "content": "#!/bin/sh\n\n# An example hook script to verify what is about to be pushed.  Called by \"git\n# push\" after it has checked the remote status, but before anything has been\n# pushed.  If this script exits with a non-zero status nothing will be pushed.\n#\n# This hook is called with the following parameters:\n#\n# $1 -- Name of the remote to which the push is being done\n# $2 -- URL to which the push is being done\n#\n# If pushing without using a named remote those arguments will be equal.\n#\n# Information about the commits which are being pushed is supplied as lines to\n# the standard input in the form:\n#\n#   <local ref> <local sha1> <remote ref> <remote sha1>\n#\n# This sample shows how to prevent push of commits where the log message starts\n# with \"WIP\" (work in progress).\n\nremote=\"$1\"\nurl=\"$2\"\n\nz40=0000000000000000000000000000000000000000\n\nwhile read local_ref local_sha remote_ref remote_sha\ndo\n\tif [ \"$local_sha\" = $z40 ]\n\tthen\n\t\t# Handle delete\n\t\t:\n\telse\n\t\tif [ \"$remote_sha\" = $z40 ]\n\t\tthen\n\t\t\t# New branch, examine all commits\n\t\t\trange=\"$local_sha\"\n\t\telse\n\t\t\t# Update to existing branch, examine new commits\n\t\t\trange=\"$remote_sha..$local_sha\"\n\t\tfi\n\n\t\t# Check for WIP commit\n\t\tcommit=`git rev-list -n 1 --grep '^WIP' \"$range\"`\n\t\tif [ -n \"$commit\" ]\n\t\tthen\n\t\t\techo >&2 \"Found WIP commit in $local_ref, not pushing\"\n\t\t\texit 1\n\t\tfi\n\tfi\ndone\n\nexit 0\n"
+          },
+          {
+            "type": "file",
+            "name": "pre-rebase.sample",
+            "children": null,
+            "path": ".//.git/hooks/pre-rebase.sample",
+            "content": "#!/bin/sh\n#\n# Copyright (c) 2006, 2008 Junio C Hamano\n#\n# The \"pre-rebase\" hook is run just before \"git rebase\" starts doing\n# its job, and can prevent the command from running by exiting with\n# non-zero status.\n#\n# The hook is called with the following parameters:\n#\n# $1 -- the upstream the series was forked from.\n# $2 -- the branch being rebased (or empty when rebasing the current branch).\n#\n# This sample shows how to prevent topic branches that are already\n# merged to 'next' branch from getting rebased, because allowing it\n# would result in rebasing already published history.\n\npublish=next\nbasebranch=\"$1\"\nif test \"$#\" = 2\nthen\n\ttopic=\"refs/heads/$2\"\nelse\n\ttopic=`git symbolic-ref HEAD` ||\n\texit 0 ;# we do not interrupt rebasing detached HEAD\nfi\n\ncase \"$topic\" in\nrefs/heads/??/*)\n\t;;\n*)\n\texit 0 ;# we do not interrupt others.\n\t;;\nesac\n\n# Now we are dealing with a topic branch being rebased\n# on top of master.  Is it OK to rebase it?\n\n# Does the topic really exist?\ngit show-ref -q \"$topic\" || {\n\techo >&2 \"No such branch $topic\"\n\texit 1\n}\n\n# Is topic fully merged to master?\nnot_in_master=`git rev-list --pretty=oneline ^master \"$topic\"`\nif test -z \"$not_in_master\"\nthen\n\techo >&2 \"$topic is fully merged to master; better remove it.\"\n\texit 1 ;# we could allow it, but there is no point.\nfi\n\n# Is topic ever merged to next?  If so you should not be rebasing it.\nonly_next_1=`git rev-list ^master \"^$topic\" ${publish} | sort`\nonly_next_2=`git rev-list ^master           ${publish} | sort`\nif test \"$only_next_1\" = \"$only_next_2\"\nthen\n\tnot_in_topic=`git rev-list \"^$topic\" master`\n\tif test -z \"$not_in_topic\"\n\tthen\n\t\techo >&2 \"$topic is already up to date with master\"\n\t\texit 1 ;# we could allow it, but there is no point.\n\telse\n\t\texit 0\n\tfi\nelse\n\tnot_in_next=`git rev-list --pretty=oneline ^${publish} \"$topic\"`\n\t/usr/bin/perl -e '\n\t\tmy $topic = $ARGV[0];\n\t\tmy $msg = \"* $topic has commits already merged to public branch:\\n\";\n\t\tmy (%not_in_next) = map {\n\t\t\t/^([0-9a-f]+) /;\n\t\t\t($1 => 1);\n\t\t} split(/\\n/, $ARGV[1]);\n\t\tfor my $elem (map {\n\t\t\t\t/^([0-9a-f]+) (.*)$/;\n\t\t\t\t[$1 => $2];\n\t\t\t} split(/\\n/, $ARGV[2])) {\n\t\t\tif (!exists $not_in_next{$elem->[0]}) {\n\t\t\t\tif ($msg) {\n\t\t\t\t\tprint STDERR $msg;\n\t\t\t\t\tundef $msg;\n\t\t\t\t}\n\t\t\t\tprint STDERR \" $elem->[1]\\n\";\n\t\t\t}\n\t\t}\n\t' \"$topic\" \"$not_in_next\" \"$not_in_master\"\n\texit 1\nfi\n\n<<\\DOC_END\n\nThis sample hook safeguards topic branches that have been\npublished from being rewound.\n\nThe workflow assumed here is:\n\n * Once a topic branch forks from \"master\", \"master\" is never\n   merged into it again (either directly or indirectly).\n\n * Once a topic branch is fully cooked and merged into \"master\",\n   it is deleted.  If you need to build on top of it to correct\n   earlier mistakes, a new topic branch is created by forking at\n   the tip of the \"master\".  This is not strictly necessary, but\n   it makes it easier to keep your history simple.\n\n * Whenever you need to test or publish your changes to topic\n   branches, merge them into \"next\" branch.\n\nThe script, being an example, hardcodes the publish branch name\nto be \"next\", but it is trivial to make it configurable via\n$GIT_DIR/config mechanism.\n\nWith this workflow, you would want to know:\n\n(1) ... if a topic branch has ever been merged to \"next\".  Young\n    topic branches can have stupid mistakes you would rather\n    clean up before publishing, and things that have not been\n    merged into other branches can be easily rebased without\n    affecting other people.  But once it is published, you would\n    not want to rewind it.\n\n(2) ... if a topic branch has been fully merged to \"master\".\n    Then you can delete it.  More importantly, you should not\n    build on top of it -- other people may already want to\n    change things related to the topic as patches against your\n    \"master\", so if you need further changes, it is better to\n    fork the topic (perhaps with the same name) afresh from the\n    tip of \"master\".\n\nLet's look at this example:\n\n\t\t   o---o---o---o---o---o---o---o---o---o \"next\"\n\t\t  /       /           /           /\n\t\t /   a---a---b A     /           /\n\t\t/   /               /           /\n\t       /   /   c---c---c---c B         /\n\t      /   /   /             \\         /\n\t     /   /   /   b---b C     \\       /\n\t    /   /   /   /             \\     /\n    ---o---o---o---o---o---o---o---o---o---o---o \"master\"\n\n\nA, B and C are topic branches.\n\n * A has one fix since it was merged up to \"next\".\n\n * B has finished.  It has been fully merged up to \"master\" and \"next\",\n   and is ready to be deleted.\n\n * C has not merged to \"next\" at all.\n\nWe would want to allow C to be rebased, refuse A, and encourage\nB to be deleted.\n\nTo compute (1):\n\n\tgit rev-list ^master ^topic next\n\tgit rev-list ^master        next\n\n\tif these match, topic has not merged in next at all.\n\nTo compute (2):\n\n\tgit rev-list master..topic\n\n\tif this is empty, it is fully merged to \"master\".\n\nDOC_END\n"
+          },
+          {
+            "type": "file",
+            "name": "pre-receive.sample",
+            "children": null,
+            "path": ".//.git/hooks/pre-receive.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to make use of push options.\n# The example simply echoes all push options that start with 'echoback='\n# and rejects all pushes when the \"reject\" push option is used.\n#\n# To enable this hook, rename this file to \"pre-receive\".\n\nif test -n \"$GIT_PUSH_OPTION_COUNT\"\nthen\n\ti=0\n\twhile test \"$i\" -lt \"$GIT_PUSH_OPTION_COUNT\"\n\tdo\n\t\teval \"value=\\$GIT_PUSH_OPTION_$i\"\n\t\tcase \"$value\" in\n\t\techoback=*)\n\t\t\techo \"echo from the pre-receive-hook: ${value#*=}\" >&2\n\t\t\t;;\n\t\treject)\n\t\t\texit 1\n\t\tesac\n\t\ti=$((i + 1))\n\tdone\nfi\n"
+          },
+          {
+            "type": "file",
+            "name": "prepare-commit-msg.sample",
+            "children": null,
+            "path": ".//.git/hooks/prepare-commit-msg.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to prepare the commit log message.\n# Called by \"git commit\" with the name of the file that has the\n# commit message, followed by the description of the commit\n# message's source.  The hook's purpose is to edit the commit\n# message file.  If the hook fails with a non-zero status,\n# the commit is aborted.\n#\n# To enable this hook, rename this file to \"prepare-commit-msg\".\n\n# This hook includes three examples. The first one removes the\n# \"# Please enter the commit message...\" help message.\n#\n# The second includes the output of \"git diff --name-status -r\"\n# into the message, just before the \"git status\" output.  It is\n# commented because it doesn't cope with --amend or with squashed\n# commits.\n#\n# The third example adds a Signed-off-by line to the message, that can\n# still be edited.  This is rarely a good idea.\n\nCOMMIT_MSG_FILE=$1\nCOMMIT_SOURCE=$2\nSHA1=$3\n\n/usr/bin/perl -i.bak -ne 'print unless(m/^. Please enter the commit message/..m/^#$/)' \"$COMMIT_MSG_FILE\"\n\n# case \"$COMMIT_SOURCE,$SHA1\" in\n#  ,|template,)\n#    /usr/bin/perl -i.bak -pe '\n#       print \"\\n\" . `git diff --cached --name-status -r`\n# \t if /^#/ && $first++ == 0' \"$COMMIT_MSG_FILE\" ;;\n#  *) ;;\n# esac\n\n# SOB=$(git var GIT_COMMITTER_IDENT | sed -n 's/^\\(.*>\\).*$/Signed-off-by: \\1/p')\n# git interpret-trailers --in-place --trailer \"$SOB\" \"$COMMIT_MSG_FILE\"\n# if test -z \"$COMMIT_SOURCE\"\n# then\n#   /usr/bin/perl -i.bak -pe 'print \"\\n\" if !$first_line++' \"$COMMIT_MSG_FILE\"\n# fi\n"
+          },
+          {
+            "type": "file",
+            "name": "update.sample",
+            "children": null,
+            "path": ".//.git/hooks/update.sample",
+            "content": "#!/bin/sh\n#\n# An example hook script to block unannotated tags from entering.\n# Called by \"git receive-pack\" with arguments: refname sha1-old sha1-new\n#\n# To enable this hook, rename this file to \"update\".\n#\n# Config\n# ------\n# hooks.allowunannotated\n#   This boolean sets whether unannotated tags will be allowed into the\n#   repository.  By default they won't be.\n# hooks.allowdeletetag\n#   This boolean sets whether deleting tags will be allowed in the\n#   repository.  By default they won't be.\n# hooks.allowmodifytag\n#   This boolean sets whether a tag may be modified after creation. By default\n#   it won't be.\n# hooks.allowdeletebranch\n#   This boolean sets whether deleting branches will be allowed in the\n#   repository.  By default they won't be.\n# hooks.denycreatebranch\n#   This boolean sets whether remotely creating branches will be denied\n#   in the repository.  By default this is allowed.\n#\n\n# --- Command line\nrefname=\"$1\"\noldrev=\"$2\"\nnewrev=\"$3\"\n\n# --- Safety check\nif [ -z \"$GIT_DIR\" ]; then\n\techo \"Don't run this script from the command line.\" >&2\n\techo \" (if you want, you could supply GIT_DIR then run\" >&2\n\techo \"  $0 <ref> <oldrev> <newrev>)\" >&2\n\texit 1\nfi\n\nif [ -z \"$refname\" -o -z \"$oldrev\" -o -z \"$newrev\" ]; then\n\techo \"usage: $0 <ref> <oldrev> <newrev>\" >&2\n\texit 1\nfi\n\n# --- Config\nallowunannotated=$(git config --bool hooks.allowunannotated)\nallowdeletebranch=$(git config --bool hooks.allowdeletebranch)\ndenycreatebranch=$(git config --bool hooks.denycreatebranch)\nallowdeletetag=$(git config --bool hooks.allowdeletetag)\nallowmodifytag=$(git config --bool hooks.allowmodifytag)\n\n# check for no description\nprojectdesc=$(sed -e '1q' \"$GIT_DIR/description\")\ncase \"$projectdesc\" in\n\"Unnamed repository\"* | \"\")\n\techo \"*** Project description file hasn't been set\" >&2\n\texit 1\n\t;;\nesac\n\n# --- Check types\n# if $newrev is 0000...0000, it's a commit to delete a ref.\nzero=\"0000000000000000000000000000000000000000\"\nif [ \"$newrev\" = \"$zero\" ]; then\n\tnewrev_type=delete\nelse\n\tnewrev_type=$(git cat-file -t $newrev)\nfi\n\ncase \"$refname\",\"$newrev_type\" in\n\trefs/tags/*,commit)\n\t\t# un-annotated tag\n\t\tshort_refname=${refname##refs/tags/}\n\t\tif [ \"$allowunannotated\" != \"true\" ]; then\n\t\t\techo \"*** The un-annotated tag, $short_refname, is not allowed in this repository\" >&2\n\t\t\techo \"*** Use 'git tag [ -a | -s ]' for tags you want to propagate.\" >&2\n\t\t\texit 1\n\t\tfi\n\t\t;;\n\trefs/tags/*,delete)\n\t\t# delete tag\n\t\tif [ \"$allowdeletetag\" != \"true\" ]; then\n\t\t\techo \"*** Deleting a tag is not allowed in this repository\" >&2\n\t\t\texit 1\n\t\tfi\n\t\t;;\n\trefs/tags/*,tag)\n\t\t# annotated tag\n\t\tif [ \"$allowmodifytag\" != \"true\" ] && git rev-parse $refname > /dev/null 2>&1\n\t\tthen\n\t\t\techo \"*** Tag '$refname' already exists.\" >&2\n\t\t\techo \"*** Modifying a tag is not allowed in this repository.\" >&2\n\t\t\texit 1\n\t\tfi\n\t\t;;\n\trefs/heads/*,commit)\n\t\t# branch\n\t\tif [ \"$oldrev\" = \"$zero\" -a \"$denycreatebranch\" = \"true\" ]; then\n\t\t\techo \"*** Creating a branch is not allowed in this repository\" >&2\n\t\t\texit 1\n\t\tfi\n\t\t;;\n\trefs/heads/*,delete)\n\t\t# delete branch\n\t\tif [ \"$allowdeletebranch\" != \"true\" ]; then\n\t\t\techo \"*** Deleting a branch is not allowed in this repository\" >&2\n\t\t\texit 1\n\t\tfi\n\t\t;;\n\trefs/remotes/*,commit)\n\t\t# tracking branch\n\t\t;;\n\trefs/remotes/*,delete)\n\t\t# delete tracking branch\n\t\tif [ \"$allowdeletebranch\" != \"true\" ]; then\n\t\t\techo \"*** Deleting a tracking branch is not allowed in this repository\" >&2\n\t\t\texit 1\n\t\tfi\n\t\t;;\n\t*)\n\t\t# Anything else (is there anything else?)\n\t\techo \"*** Update hook: unknown type of update to ref $refname of type $newrev_type\" >&2\n\t\texit 1\n\t\t;;\nesac\n\n# --- Finished\nexit 0\n"
+          }
+        ],
+        "path": ".//.git/hooks",
+        "content": ""
+      },
+      {
+        "type": "file",
+        "name": "index",
+        "children": null,
+        "path": ".//.git/index",
+        "content": "DIRC\u0000\u0000\u0000\u0002\u0000\u0000\u0000\u0003`E��%N#~`E��%n�\u0000\u0000\u0000\b\u0001\u0000LIb\u0000\u0000��\u0000\u0000\u0003�\u0000\u0000\u0003�\u0000\u0000\u000e.��\u00027�NɈ\u0017�\u0017?�Nd+�f\u0000\u000e01 Overview.md\u0000\u0000\u0000\u0000`LL�\u0005ǋ�`LL�\u0005ǋ�\u0000\u0000\b\u0001\u0000LJP\u0000\u0000��\u0000\u0000\u0003�\u0000\u0000\u0003�\u0000\u00001\n׫BI\u001c\u0012*���\u001dr��q�9�&@\u0000\u000f02 Artifacts.md\u0000\u0000\u0000`L�_\u000b-�\u0017`L�_\u000b-�\u0017\u0000\u0000\b\u0001\u0000L@\r\u0000\u0000��\u0000\u0000\u0003�\u0000\u0000\u0003�\u0000\u0000\u000b��r�e,\u0001����\u0013\f8��}M�˽\u0000\u001203 SCRUM Events.md\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000TREE\u0000\u0000\u0000\u0019\u00003 0\n&�\u001awb�h�_r\u001d\u000eꀈ�]#ww��6Vx��g��*�A3�MXe��"
+      },
+      {
+        "type": "folder",
+        "name": "info",
+        "children": [
+          {
+            "type": "file",
+            "name": "exclude",
+            "children": null,
+            "path": ".//.git/info/exclude",
+            "content": "# git ls-files --others --exclude-from=.git/info/exclude\n# Lines that start with '#' are comments.\n# For a project mostly in C, the following would be a good set of\n# exclude patterns (uncomment them if you want to use them):\n# *.[oa]\n# *~\n"
+          }
+        ],
+        "path": ".//.git/info",
+        "content": ""
+      },
+      {
+        "type": "folder",
+        "name": "logs",
+        "children": [
+          {
+            "type": "file",
+            "name": "HEAD",
+            "children": null,
+            "path": ".//.git/logs/HEAD",
+            "content": "0000000000000000000000000000000000000000 0cc03ea4fc845f335e9f2471fcc26cad2cbcb2f9 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615169396 +0600\tcommit (initial): initial commit\n0cc03ea4fc845f335e9f2471fcc26cad2cbcb2f9 f918b66cbb9a8c7aa9f94e3130aaf4141abc0a62 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615312054 +0600\tcommit: Added notes on artifact\nf918b66cbb9a8c7aa9f94e3130aaf4141abc0a62 e283c75067273ef71fe90161b3c303f8d467314c nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615316658 +0600\tcommit: Added a real world product goal example\ne283c75067273ef71fe90161b3c303f8d467314c fba466db7bddbe998dcdbb930af55497fb749608 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615424318 +0600\tcommit: Added notes on product backlogs\nfba466db7bddbe998dcdbb930af55497fb749608 65f8ae51717b3cb30ea027a75db960fa9fd9810b nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615508673 +0600\tcommit: Added notes on sprint backlog\n65f8ae51717b3cb30ea027a75db960fa9fd9810b 8f5625336d9e44a18dca615b659a0360a10239d9 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615558531 +0600\tcommit: Added notes on Artifact completed\n8f5625336d9e44a18dca615b659a0360a10239d9 58cfec9290c9bb4ad6d3bd3bc0eb616e4b2d8aba nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615634271 +0600\tcommit: Added notes on sprint planning\n"
+          },
+          {
+            "type": "folder",
+            "name": "refs",
+            "children": [
+              {
+                "type": "folder",
+                "name": "heads",
+                "children": [
+                  {
+                    "type": "file",
+                    "name": "master",
+                    "children": null,
+                    "path": ".//.git/logs/refs/heads/master",
+                    "content": "0000000000000000000000000000000000000000 0cc03ea4fc845f335e9f2471fcc26cad2cbcb2f9 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615169396 +0600\tcommit (initial): initial commit\n0cc03ea4fc845f335e9f2471fcc26cad2cbcb2f9 f918b66cbb9a8c7aa9f94e3130aaf4141abc0a62 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615312054 +0600\tcommit: Added notes on artifact\nf918b66cbb9a8c7aa9f94e3130aaf4141abc0a62 e283c75067273ef71fe90161b3c303f8d467314c nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615316658 +0600\tcommit: Added a real world product goal example\ne283c75067273ef71fe90161b3c303f8d467314c fba466db7bddbe998dcdbb930af55497fb749608 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615424318 +0600\tcommit: Added notes on product backlogs\nfba466db7bddbe998dcdbb930af55497fb749608 65f8ae51717b3cb30ea027a75db960fa9fd9810b nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615508673 +0600\tcommit: Added notes on sprint backlog\n65f8ae51717b3cb30ea027a75db960fa9fd9810b 8f5625336d9e44a18dca615b659a0360a10239d9 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615558531 +0600\tcommit: Added notes on Artifact completed\n8f5625336d9e44a18dca615b659a0360a10239d9 58cfec9290c9bb4ad6d3bd3bc0eb616e4b2d8aba nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615634271 +0600\tcommit: Added notes on sprint planning\n"
+                  }
+                ],
+                "path": ".//.git/logs/refs/heads",
+                "content": ""
+              },
+              {
+                "type": "folder",
+                "name": "remotes",
+                "children": [
+                  {
+                    "type": "folder",
+                    "name": "origin",
+                    "children": [
+                      {
+                        "type": "file",
+                        "name": "master",
+                        "children": null,
+                        "path": ".//.git/logs/refs/remotes/origin/master",
+                        "content": "0000000000000000000000000000000000000000 0cc03ea4fc845f335e9f2471fcc26cad2cbcb2f9 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615169416 +0600\tupdate by push\n0cc03ea4fc845f335e9f2471fcc26cad2cbcb2f9 f918b66cbb9a8c7aa9f94e3130aaf4141abc0a62 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615312062 +0600\tupdate by push\nf918b66cbb9a8c7aa9f94e3130aaf4141abc0a62 e283c75067273ef71fe90161b3c303f8d467314c nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615316665 +0600\tupdate by push\ne283c75067273ef71fe90161b3c303f8d467314c fba466db7bddbe998dcdbb930af55497fb749608 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615424325 +0600\tupdate by push\nfba466db7bddbe998dcdbb930af55497fb749608 65f8ae51717b3cb30ea027a75db960fa9fd9810b nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615508701 +0600\tupdate by push\n65f8ae51717b3cb30ea027a75db960fa9fd9810b 8f5625336d9e44a18dca615b659a0360a10239d9 nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615558538 +0600\tupdate by push\n8f5625336d9e44a18dca615b659a0360a10239d9 58cfec9290c9bb4ad6d3bd3bc0eb616e4b2d8aba nahid-linux-desktop <b.m.shamsnahid@gmail.com> 1615634277 +0600\tupdate by push\n"
+                      }
+                    ],
+                    "path": ".//.git/logs/refs/remotes/origin",
+                    "content": ""
+                  }
+                ],
+                "path": ".//.git/logs/refs/remotes",
+                "content": ""
+              }
+            ],
+            "path": ".//.git/logs/refs",
+            "content": ""
+          }
+        ],
+        "path": ".//.git/logs",
+        "content": ""
+      },
+      {
+        "type": "folder",
+        "name": "objects",
+        "children": [
+          {
+            "type": "folder",
+            "name": "0c",
+            "children": [
+              {
+                "type": "file",
+                "name": "c03ea4fc845f335e9f2471fcc26cad2cbcb2f9",
+                "children": null,
+                "path": ".//.git/objects/0c/c03ea4fc845f335e9f2471fcc26cad2cbcb2f9",
+                "content": "x\u0001��A\u000e� \u0010\u0000=󊽛6\u000blA\u0012c�\n\u0005j7\u00160-M|��>��L2\u0013j��@�=�5%�q\"�h&�t1��H�JR����8؀Ri���m�+\u0014?s�\u0016.���i{������~�}޾��Ȟ�>�|\u0003i� ����\u0019\r�8��o�����\u0002���\u0000�;D\u0012"
+              }
+            ],
+            "path": ".//.git/objects/0c",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "1d",
+            "children": [
+              {
+                "type": "file",
+                "name": "f44306f30486742b4a7142e47f99b57c012303",
+                "children": null,
+                "path": ".//.git/objects/1d/f44306f30486742b4a7142e47f99b57c012303",
+                "content": "x\u0001+)JMU�0e040031Q00T�/K-*�L-��MaX�|\"��)��\u001d����_�K�~�\u0006Si��XT����\\R\fRz�)� ������\u0006\n��\u001a��Y��\u000f\u0000�C\"�"
+              }
+            ],
+            "path": ".//.git/objects/1d",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "26",
+            "children": [
+              {
+                "type": "file",
+                "name": "a21a7762f168de5f721d0eea8088ed5d237777",
+                "children": null,
+                "path": ".//.git/objects/26/a21a7762f168de5f721d0eea8088ed5d237777",
+                "content": "x\u0001+)JMU046d040031Q00T�/K-*�L-��MaX�|\"��)��\u001d����_�K�~�\u0006Si��XT����\\R\fRz}�����֊�\u001fd���(|f٫�\u0000Sj�\u0010�\u001c\u0014��Z��\u0007Q}��T�\u000e����\u001e\n�X\u001c�T���^\u0000Y54%"
+              }
+            ],
+            "path": ".//.git/objects/26",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "3d",
+            "children": [
+              {
+                "type": "file",
+                "name": "e3c2a1c25acbd24a63cddcfd827dd856dacb92",
+                "children": null,
+                "path": ".//.git/objects/3d/e3c2a1c25acbd24a63cddcfd827dd856dacb92",
+                "content": "x\u0001+)JMU�0e040031Q00T�/K-*�L-��MaX�|\"��)��\u001d����_�K�~�\u0006Si��XT����\\R\fR���?�_U\u0007\u000fZ\u001e�y(�p��c\u001dG\u0001�^%6"
+              }
+            ],
+            "path": ".//.git/objects/3d",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "58",
+            "children": [
+              {
+                "type": "file",
+                "name": "cfec9290c9bb4ad6d3bd3bc0eb616e4b2d8aba",
+                "children": null,
+                "path": ".//.git/objects/58/cfec9290c9bb4ad6d3bd3bc0eb616e4b2d8aba",
+                "content": "x\u0001��Kj�0\u0010D��)z\u001f��c�d\u0018Br�\u001ew{,bI��@�\u001f�+��U�x�֜S\u0007\u001b�[�D�\"YC!��\fF\u0016�\u0005kX�P�1\n{�.���.)\u001d���z�\u0017�g2�WB�\u001f�\u0017�\u000e5\u0019m��W��\u0005��ķ#��ύ�}�z��1������̔�i��\u0003�`���\u001e�k�Z�v�v�?I}1\u000bC�]\u001a�\u0002���8t\u001eTJ*O�\u000b�%Ws"
+              }
+            ],
+            "path": ".//.git/objects/58",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "65",
+            "children": [
+              {
+                "type": "file",
+                "name": "f8ae51717b3cb30ea027a75db960fa9fd9810b",
+                "children": null,
+                "path": ".//.git/objects/65/f8ae51717b3cb30ea027a75db960fa9fd9810b",
+                "content": "x\u0001��Kj�0\u0010\u0005��)z\u001f���ς\u0010���ԭ�\u0018K2�\u0006��cr�l_AQ/�R��ɏq2���RT���iu*͖��qQN'�\r�VK4(\u000e<�\u000eH\u0001��\u0014\\ \n��J�B�Jb2F{�����U�sl턊[�۞��u#��\u000e�\nS�����џ{��O��o��l�\\�S�)���Z����7�_\"&�mp�V�\u001fg�\u000e\u0005�����\u001b\u0011�X�"
+              }
+            ],
+            "path": ".//.git/objects/65",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "6c",
+            "children": [
+              {
+                "type": "file",
+                "name": "e3fc3e4691d873f16e790c2374f945aa432c5a",
+                "children": null,
+                "path": ".//.git/objects/6c/e3fc3e4691d873f16e790c2374f945aa432c5a",
+                "content": "x\u0001+)JMU�0e040031Q00T�/K-*�L-��MaX�|\"��)��\u001d����_�K�~�\u0006Si��XT����\\R\fRzP�u�a��Ч�b\u0019\u001dy��n���\u0005\u0000��\"�"
+              }
+            ],
+            "path": ".//.git/objects/6c",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "8f",
+            "children": [
+              {
+                "type": "file",
+                "name": "5625336d9e44a18dca615b659a0360a10239d9",
+                "children": null,
+                "path": ".//.git/objects/8f/5625336d9e44a18dca615b659a0360a10239d9",
+                "content": "x\u0001��Kj�0\u0010\u0005��)z?��,�\u0007C�\u001c��n�\"�dl\r��cr�l_A�K��2`v��8���Y��n�Nɀa�R�䴵\u001e#�L�}�^�\u001d\u000fn\u0003��\u001e�(�\\�)j�(g��P\fVf\f��W2\n|��\u001f�p-t�J{������;<�T�s�z�ѯ�e�R����2�x�\u0015ܤ�R\\��w��M�I�\u0004�\u000f>�7x\u001e�dL\u0003�ľ�`\u0012�z�Y3"
+              }
+            ],
+            "path": ".//.git/objects/8f",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "9a",
+            "children": [
+              {
+                "type": "file",
+                "name": "9297c2ef25753d06809707faca594ffaf335e3",
+                "children": null,
+                "path": ".//.git/objects/9a/9297c2ef25753d06809707faca594ffaf335e3",
+                "content": "x\u0001+)JMU�0e040031Q00T�/K-*�L-��MaX�|\"��)��\u001d����_�K�~�\u0006Si��XT����\\R\fR�⟵�a��N�\u001f2\u001bE�޽�j�*\u0000\u0000ˇ\"�"
+              }
+            ],
+            "path": ".//.git/objects/9a",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "a8",
+            "children": [
+              {
+                "type": "file",
+                "name": "e7910237ca4ec98817e3bd173fd44e642be766",
+                "children": null,
+                "path": ".//.git/objects/a8/e7910237ca4ec98817e3bd173fd44e642be766",
+                "content": "x\u0001mW�n�6\u0014�z��@\u0016\u0005���\u0007\u001a4]\u0014��i�&v\u0002�E��P\u00125\"L�*I�x��_���%=璚��,�h(��>�9��r�R/^�x�ݓ'���^]\u000e)�f����b����\u0010mc��x�G=�j��Qɫh�S�36�1\u001fį�M�U\u0015�\u0011�z\u001d�M:S�~�ս��!��IM#�SX�M�qĻ��/ծ3�\u001c\u000e\u001c�v������������\tv�\u0016�[Y٫\u000e[pCBtK��\u001f6jgS��u��ԟ�:&\u0013�K\u001a�\u0004M7��\f\u001b;\u0018>%��J\u000fM���\u0002���\n�<A�V\u001b댺҃m��/\u0016wpe��d��C�tT�U�v���\n��[d�\r�G\u0000�\b[�[\u0005������,����|��K��Y,N����oW�������\u001a\u000f�7�ޭ>����w7o�ިO7\u001f�ެ��.��.\u0016�w`\u001aj��\u0007\b�2����^�m��8?�M�m�i����\u000b�E����8����X<��qM�ƒ�_c�Z_\u000e���f�.�%IX��Z��%:Ŋ�&ƒ�佋g�C�l?:����D%�s�)��%�X�{4��d��s�\u001bCO�x����\u000fj�;�s���C��\u0007a\u001fLg���A�506$M�>�� ���^��\u00047�W�d\u001d(L�u�\u0013�\u0002������\u0007���\u0007�\u0013�\u0006���~�6�lg̠pW�C�f���Ϊ���8?�)�&�4�s���\u001e�;S��+�s�P\n���L\u001b�\u0013p�,�$\f]!��8�*vv�w�\u001d@�H2\u0011܍��G�%��2�Y�\u0016��]�<:='�\"\fYS\u0010��#�+�h�y��u6�����ʥ� 1�R�L>��F�j�����jo4��]�T��'�!��#@TK(E?\u000ee/�g�Q>�\u0017��:�\u0016��\u0003CK\u0019g\u0015xgQ� \u0004\u0011Z\u001e4\u0012Z9�S9\u0002�\u000b�����&*�\u0001���Տ/�����m��t�l�H���Q�Nt\u0003\tC�����)�0hG�\u0006\u0018x�\u0003\f|%4(j��\rH�.�\u001e��t}�T EO�e)˂��\u0001\u0000���t�\u0003\u001c׎u##P�9\u0007������v,E�\u0013%>\u000b?7V�) ��\u0013x��\u0006��\u00065pdt\u0000٘\u0012�؀h\u0011\u0019�|o�WǄ1��+\u0013��\u0003��>S�\u0013��hy\t\t\"�`��h\tTT\u0017�m,�ԡ\u0007��m\u0015�#P�\u0002OrELs�\u001e�b0<Ȅ\t�\u001a�Q�\u0007��l���D�!\f]I�2�V�!\u000f�W5�\u001f�K'9\u0007�\u0007~\u0006�焆$Q�\u0007\u0005�I]\u0004\u0001�ɴ�K��@�\f�u���HH\u001e�dl@\u00048�\u0006=��cQ�j��\u0019|^X���ܣ�\u001a�|�R@\u0001\u0011׾���6�����G�����K�$~\\@��]6�\u001e]�?�L��y}0��\b�O��\u0001Q�\u0013����A�U�����?��b�D���1�\u0000�y?楋�R��\b\u001a\u0005���\u0001]j�n�`���9�\u0007��\u001a���:\t�\u0019�rvOf�Y�K�K'(�*?����β_F\t\u0000����\u001fD�\u00015��QT�X���\u0005;��\u0001�=H�uK��@\u000e�,2M�\u0018؃�@�\u0011� �������;8����Z��M�)�յ�\u0019z\u0002�t/�\u0007R�=�\u0003F7i�`K\u0000�ئ�f�\u0003e�\u000b�۹\u001241O�\bl��m@\u0010u0c��YΙ\u001e�\u0016Q\u001e$�9����I�!\u000e�''R/�;9\u001a1\u001f�4�A\b#\u0018g5�ߧ2�~�\r����;D�}�V�tr��\u0005ߥ\u0017B��W\u000bȃ�@\u0005�4h\u001d���k�&dk]�B��'�2\u001c����A7�\u000b��P��欉�j�1J�?�\u0001E\u0005�\bd���S�GF\u0014\u0011�g`~\u0002�\u0007��>^L2�1�R\\L��u.�,\u0012�%;LC\u001ć]�dd���\u0007L\u001e?v�L����UT\u0000`�c�(\u0011<��*�pg,y��xfi�E�s��:W�ʘ\u0004����\u0016�&�\u0016�A\u0016h�W�\u000f5>\u001d�9HxCz�{r\u001f\n�\u000b*{�\u0007�\u001cG7b\u001d��!�\u001f��c���\u001e'�!s���$]���G�a���@�1�{�az\u0000Ť��Y�\u0000�\u00162��)tAH�+b��&��w�\u0003F��\u0002��u�j�\u0016�9Y�1�\u0014\u0013�\u0001ݑBL.v�z�Ƹ�6&��(�h�\u0014Ⱥ�n�Y$\u0004ғ;*_\u0017h�q#����\u001d\u0006Z�J���DH�\u0019\u0012B�}�\u0016Z\u0019|\u0010)�A�=[�\u0007\u001f\u001c\n�"
+              }
+            ],
+            "path": ".//.git/objects/a8",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "bf",
+            "children": [
+              {
+                "type": "file",
+                "name": "c5fe3dfa7ac1c139c76ce11146a1abdcc688c5",
+                "children": null,
+                "path": ".//.git/objects/bf/c5fe3dfa7ac1c139c76ce11146a1abdcc688c5",
+                "content": "x\u0001��[o#�\u0011���_р\u001f\f\u0010���\u001f�,\u0002\u0003�V����6�ւ�8\u001c6ɉf����R~}�S�=��k$@\u0000�Źtuuթ�S5�:,ݏ?���?}�;�j]�C?�}�����\u001e+�����2t��ݸ!�a��mٍ��0V+�\u001b�w\u0005�~��I��l����ԅ�X\u000e�(\u001f같����=����]�e�\u001b�\u000e'�x(�5�m��R]պۋ�Ͽ���:߳�?q���=,\\��ⷢ\u001e��t6����[L\u000b\u0017'iݮ\u000b�hݣ�w�+�~��m���\u0015\u0017�\u001c��rq�*vCa\u0017������5E��\u0006�5��n\u0015\\\u001b\u0006�#�\u0016�έ\n�\u0007�S�\u0016\u0013�&\u0004�.�r���\f�CR�HC�-zW���\u0006\u0019\u0003!��[��\u000f�\u001f�\u0018\u001f\u0011߹�+�.����מ�l�pu���҅�?u�����\u000f��\u0017�g��d\u000f}M�\u001c�_��M�Y�*�=���X����k;��_Wm%3���B�qE㱻=�\u0013Uǲ�E]\rϨ�!\f2�6��\n�<���\u0010fz\\L\u0006Z�~(Z\f�\u000e�,�ί��l-%�u�\u001f�\rg��-��,{�\"��f\u0017:D\f��\u0018tOϳNa\u001cp\u0007�+\u0018^�\u001dLN��l�\u0011\u0002\u0010T���ʮ7`�����-}�10\u0012��\u001d;ޒ���w#�:q�EYV�\u0017�Q��\u0019�,�w���eP緧]\\Y�\u0002bY��X�\u0005�����|��\u001e�>�];T˰�Ԩeo\u001d�8q�Ya\u0017��Z�\u0002C\u000e\u001d\u001e��\u001eY�\u0018\u000f�W�\u0006���J\b`1\u000e\"��YqN\u0017�cK�d-�`�G�*\"Sr8r�����2�BO�e�����e����<h�V\f�j�\u000f\b��@\u0004Z\\\n6\\K���j�׿#\u001c���u���\u0010\u001e�6\f��y�|�,U��I��\u0007\u0019���\"��P��g#�E���9\u00074~mzK�+�ɰ�\u000e����˘\u00019��a/��4����O[b�(�\u0005�m�-��5\u00116߲����0�W�%\b՜UQ\u0016m�B�t��\r:�\u0014��B��MQ�f���r2��r2PV��59Ť\u001c�\u0012Q��:P+|�R\u0000/}L�\u0007Sb��(�hu���d{����\u0017��\u0004�\u0007��\u0017�'�m�@��}\u0019M��\u0002DK´C�\u0001�p���̌�@I���\u000b����a\f�eז���\u001e*EL\u001dbF���p\u0002��%��\u0012��DL\u001d��qI�Ͽ��zO�B��VGz\u000e�3\u0005q*�=EE\u0004�\u0015�?��\u00074���y�z�Ƭڻ��<��M\u0018�\u0001\u0007b}+y�#\u0010㻔5p�\u0001ͮ*rlo}�#CG\u0013�<:j\u001dJ\b���mB��@��(R�x�7J���}\r2D\nd����\u0016t�R���ݨ�\u0014�T�\u00040�\u001f�-vJ��燲;��\u0000�=G�UP!��o���4Ŏ�blK\u0000���*�E��$\u000fY�L�rK���~�&�\u0001�\u001bX�a��g�\tH\u0003)H�\t2e���F���Kt��\u0012�ĤҀ[>����\u0016\u0016�H�T�\u0005���-4\b\f�u�=T��0��7I�\u0005�{_\b\u0017JOWQ1�\u0005��WO�N4\u0003���~!E'S�Ǌك�]J�׊Z�&y�?Ƥ�\u000b��\u0010!A�\"Ai6��ć}\u000b$9��R���±��\u0011k�ʯT�y��\u001cF�8\u0016�`�DM�E0ے0u3\u000bJ�%U�\u0018b�YT�\fu],C��X�\u001c��෡�\u0016�c�_�\u0010&}9�%\u0001���\u001a�$��R7��t���T\u0018lG\"sJph\rL�ﬆ\u0018��\b�k�F�s\u0016���\u001f�\u001c�\u0000� \u001c�T���\u0013���y�ڭV'nܭtȞƀt� �`t\u0015\u001d,͘hD\u0019\u001186i4�\u0011��\u000e����V0�:ȡ��RL>\u0004�(a�z�i�(Ly�\f{XoP��\u000f\u0004�>::�IK\u0010\\�(7�׊�!�򀵦��*ޖg�R\f:��S�6�g��\u00124��L{����w�\u0006�\u0007�\u0011�UC�\u0007jJX\u000f0�/��]\u000f�&�QDV>��X�� �N���n2�270�\u0014���S� �T#��[\u0011=Dd�\u001f�!�-v;�\u0014����\u0013�ͮ�̨�B�N\u0007SDIrQ�g�LY\u0011�� U�]�%�e���s/��'�T$zkڸy�@D* \u0007B�\u0014!\u001c\u0005<�\u0007G\u0007+6\u001d\t\u001b����T\u0018Y�'.�� ���Ľ���Z\u000b��ӫ�q�s.�J﹞G2�6\u0014|̃щ7#D����D�/\u0016M��O�\n�V�i�կǢ�H�QFd\u0003\u0010̊�`.�Z�ke�\u0005\u000e\u0013��Q�o,\u001b��K>0l�#�Lo��G\u0005��o޼��Dn1\u000f�,�T\u001dN{�/�\u0017��#gD���s���\u001c�lGO\u000e,F��C\u0001\u000e�M*�G\u000fiUI 1V\\�H�ɉb�:H�g��~�\u000ec�;j��;f*�u\u0011�\u0018]V�b��ޗE�\f�+::^\u0001�~\u0010\u0012Bg�F�X�\u0017�&�hXo?/�[��\u0002��\u000f=:\\��R���P��p�\u001cW4Y�}q\\�7/��L&\u0001��0\f�v�^>�y\u0014���\u0001�\b��0\u001cw;������\u0015�_�\u0016��j�Q�J�0���\u0005�՝�����YF���\u001c��[V6\u0003��j��G\u0001mKi\u00130�?n�&M��+t3E�!�K�㪅I�{ϹA\u000bK\u0014����M:Y�,,Y���\u000e��\u0002\u001bM�HHT��\t��\u0014���Q4�A/\"ۓ���GXS���d�\u0013ˢ\u0007ʙ��\u0012��M�Pc�Z(�\u0011�M�c\u001d�\u0018\u001b�\u0013w����n�\u0016�ʗ\tn�-�\nJd�H�R>��j��Ş'I�*0�\u001c�2\u0003�2���\u0013[�\u0001�_\u000f�\u0012�O\u0010-J�ͯ4��o�A��v~\u0011zl|��\b�=�N)��\u0005H��-�nk�6j�¸!�\u0019�\u0001�]&(t�5\u0016P\u000b\u0003�{�^|\u001b\u0007j\u0017L�b\bN��x�\u000e6v�Tn�����Zɥ�8�L�8x2Y�F[�ata��D�O�L]�|�7������\\�|�~R�p\u0015����^�r���~yqw�[z��V%\u000e�?�]�=\u0016c�<d\u0012��SnB��i1����\u00133Z\u0011w��j����^��#\u001bK�iHf*����/DaHU��� jp�\u000e\u001d6Gu��{���'��\u001a\u0004'<�%�b�\u0018\u001b�\u001d4R-�I�L.�F\u001cH\u000b6��!̨)\u0013��#�^I�\u0002+\u0012c��Ri���\u000b\u0019�B=��\u0000\u0003�!N�eŮ0>��5\u0011\u000e�� ��F2\f'��,h�NI�\u001cш���z�Be�\u001f�ݓ1�h+�\u0005�؋���-\bv�jM���iT(�f4�F\u0011��E4\u000fEk՚W�g�\u001a�Bc^\u0012���x�\u0015��c*s\u001cɄ�g�\u0000���qʿB�\u001f\u0015s-R\u0003\t�l{i�U0:\u0011P8��\"�uL�J׷10��q�\u0007<�\u0016Z��@L��\u0005\u0019�Y�\u0006�\u0004ȕm_n\u0003]��4*��4���\u001d��[������}�\u001c\u0013[�S��~�k�} \u001d�3�\u0001�Y�X��\u0011�&�Y+�L�i\"g���\u000e��N M��vY6D\rѧ���o\u0015�)�@\u0015��*i���H�Sx�/�}\u001c�\u0004��H\u001b�nl\f��JS���\u0002\u0002:IhP#Ż�4�\u0006�����u2gʚ�=ܓ?f��L\u001cl�\u0018\u0000���Ɔ����zU�,��1���\"����y<\u001a\u0007fl�S8�\t�Y�e���F�J��y\u0004�؀9*Cm�xZ�6��Mds�K���H\u000f�t�>���J~?�K��c\u0019k�f�\u001aK?�=���R\fk��(^����F#���� �`���*t�\u0015\u000b鶭6���[|C���\u001eD��-�Yb�H�-���Fݩ[ {��\u0012\"�\u001e�'8�\u001d\u001b�'\fړd톌c�mYm��C;����OH-��6e��\bR��XČ9����[�j�#x����\u000e��\t�E-dk�0�.+\u001c�\u0013�\u0007�R����DLc��tź -��!�ƾ\u001d�W�o?�\\�z��L��{\u001b��P\u0002X������!Ϭ���\u000e�\u00160n\u001b�ƈ�G:}XI�\u0011\u001b7�\fg�`\u0012Ц���8�0vt���@�}��\r�\"��ET`<^e�!����5�'��b��6�\u0017���d��(��\f�CFJ��5���9�\u0001�3D��ĽzƇ����U\u001c\u0005+�3't����\u0017-�\bI�%:�L\f�7�\u0015�!d\u0005S�P�^+l�'&X\u0014\u001d�e\u0013��\u0006�[�\u0017,=_\nWQM�q�`�r\u001c�\u001d�A\u001b��\u0004妍)��;��'C�'�Tq��\u0000�Ώ_"
+              }
+            ],
+            "path": ".//.git/objects/bf",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "c1",
+            "children": [
+              {
+                "type": "file",
+                "name": "2585b8316ef755e56b1668886e3ff6dbab6b4d",
+                "children": null,
+                "path": ".//.git/objects/c1/2585b8316ef755e56b1668886e3ff6dbab6b4d",
+                "content": "x\u0001��]o\u001b�\u0015�{�_1@.\u0002\u0010��$\u0017\r�\"�,˶�$r-9B�\\\u000eɭ�;�~�V}����r);h�\u0002m-��̜����\u000eK���^~��o�q\u0017m_����f�o�y�����\u001ff�\u0017/^�f\u0017e\u0019�U�l\\\u001f\\���l��{7T+�\u0007�w\u0005����M���fߝ�\u000fmX\re�^\u0017�C\u001d6���������\u001f��uS�~���\u0015\u000fŸf|��yWW5����_\\����Xԝ��}h\u001f\u0016.�n�[Q\u000f~q>��W��-ƅ���n߆G��k���#yS>��\u001f�����bU���~��C�;�+�'��vǹ\u0007�V�5�w��hahݪ�}��Ѐcg� �UQn]X\u001b�?$q&\u0012�mѹ2�vU/0��P���ua��-��\u000b�x\u0006����U�w:3��\nW\u0007�\n)]X�K*=F;\u001d��\u000bE��~f�M��׶���g��:\u000bWe�{��\u0018�^Wumz.��u�T�Q��\t��\u0014;\u000f��\u001eKT-��\u0018���\u0010\u001d%�e�m\u0018�\u0015�<���<��\u001c\u0001Z��/\u001a\u0000Z�Vȼ�4�%\u0004XW�1.ڠ+\u001f�o�\f�\u001c�\u0016\t]���e���\u0015���}�)\f=��tE�3�s`��v4\u0014��[9t=��μ\u0003I���n�\u001b\u0010\u0001)��oL�%�#��\u0007Lv�\u001e���\u001a/F��w�h�_t�j�=;=��ʢ�7�E]\u000e����*\b�v{\u001f��ǁ\u001f8��eX�7b�W�#�\\eP�C�UKV�f�b�:ʑE�A!'��@p\u001b��\u0001����O�b�6�H!d-_\u0001�G\u0005,[�\f1����k9��ȅ�-+d:>~+h>\u0017;�Aڵ\u0002q_�?�\u0000Z=ah�)�������\u001a����'0r��\u0014�Cxp�������\u0003�T�'\u001d�$\u0004X�ً��}�������ip�\u001c��u�Y&\\�t\u0006�RR�Q�.c\u001aD�_�AR�h�\u001fK���\u0004��=\u000b��\u0018`����|�\u0019���\u0007�b-�P��\n���ɮ�%\u001f�K%\t\u0014�B��MQ5\u0006Z�f9�`�\u001c\u0001��u�&��.\u0013,��6�\b\n�o]�⥏��\b%���\u001d&�\u0013�w#�f���.��\f�{�3��l��Ͷ���\u001c�!k�R\u0007\u001c^~����\f@xIt�M\u001b����\u0003\f��~[*�\ru_)b�\u0010�\n����h�OKΝe'���?��i]�Ͽؽ񞴅8\u000f�Tz\n�3\u00011*�}��ȕW�?�<xӹ���(zk`�ٝ/d\u0019��\u000bC�c@з��3\u00021~Km��Z\\���\u001c�[_�I�\u0011�S�\u0011�XG(_On\u0013\u0002j��F�z��|Q�����x����\t�N�A�R�\u0017Z�FY_�\b��\"&���Xr�)I?�\u001fk�|�\u0003��K�B��R�%\u0015i�\u0013�bhJ\u001c�́Un�fC]��Ƃ��H����T�9��[\ra��'\u0015\u000b�\u0003)Hz�\u0004���|�Q5�\u0018L4��\u0012�ĤҀ[>����\u0016\u0016�ȢT��,\u0005�[� gH�#��\"�\u0012\u0006\u0007�]��\u0002�/�\u0017JO�Q0Q\u0006~��>�u�\u001a��4S�ǲ��\u001d��\bo\u0014��M�$�\u0018��_\b��\rɕ.�+�f\u001f������(-|\u0011j\u001f�X8�\u0014?bMY��((�W�*\u0002Z�Z��\u001am5R\u0017�ٖ���y��XR��!��E��P��2�l\u0019K��C\u0019\u001e�6�hi\u001184�K<�v_\u000e��\u001c��\f\u0010��J�\u001bO]RpW�*\fv\"�9&8��Md�,�h��\b�k��\"�\"Z?��h����A~�[���4B�)�V�V�37�WR\u0012��\u0018'\u001d%�'\u0018gE\u0006K3�5[\u0019\u0011�B\u001aa3vTց��t�m\u0005\u0013��\fz�,�d%�G���\u0011\u0018���)�\u0018�����\u0018���8DCg1�\u000b��v�\r䵢{��<�ZS|;\u0015o�3�R\u0000���S@�ϳ��\u0012�\u0012�\u0019���)pa��;U\u0003���\b�a�=5%�{\u0018ח����~#t\u0014��\u000f�5�\\�\u000bq\u0012�QI�=h�270�\u0014���S�c�R݈;lE��\"��\u0011��b�b��J�w�x�!��l�\u0011F�\u00142wRL\u0011����P<\u0011dʊ`f\u001b���3-�,Cm��{\t�U>��\"�Y����\u001dD����\u0010zF\bG\u0001O��D�bӒ���a�.J��J��\u0005-\u001b��*��W#�Va�~x�9�~΅_�=��Hf9��\u000f<�N�\u0019!ZU\u001d�'\u0012~�h\u0012-v\"T���LK�~=\u0016mE��{D6\u0000��H\nf±ߺQ�[`0�����\r�1oٳd\u0003�ͬ�tz���W0|���K;K�\u0016x��RO�b��<���d���\u0019�@��9s�G�m���bT\u001d�\u0015�!ؤr<yI�J\u0002���G\"LF\u0014{�\"��9���;�E���O\f*{t\u0019�\u0018]V�b���WE�\u0004�+Z�^9 M!$����>c\r_X�\u001e�D�:��ʬş\u0012�5�C��?�j)Q�[�uq��\u001cV4Y�}9�ݛS\u0010\u0012d��C�\f��)<˪����78{t�O0\u001cwۇ�����\u0015�_�\u0016��j��\\%�0��f\u0006j�՝����℁F�:�\u001c��[V6��v5^գ�����3���_�$\u0012�w3J�!�K�a���J\u000b�s��\u0016�(P����7�d�na���c\u0014w�\u0014\u0005�h�DB�\n���\u001d�H%U@��\u0006��lO�\u001e�\u001eaM��\u000e���,�\u001e)g�oLl�6�C��j�\bG�6�Ԛ�\u0018\f���ƍ��n�\u0016�ʗ\tn:-ʞ\nJd�������q��3��ƪ�Ts��\f`˰\u0002��l�\u0006Hv=NL\u0018BA�(�6����e\u0010�&,:�$�8�~[\u0011�\u0007\u0018�Rb!\u0004H��-���8m�̅aC\u00043��)������ �\u0016\u00067�x{�m��]2��!8N��Ou���r�+eE��h%?�ġc\u0014��\t�,��X���\u0001Q���܅���������G����+��څ�X\u001d����+w��\u001fW�w׿���lU����ݥ�c1��I�\u001c9\u001a�c��5-f���7qlF+�n�pm���n�A\u001c!�l2MC2SYܿ�}!\nC�\u001aq2@���\u0015\u001d:l��Q\u000f*k�OP!5\u0017\u001c��-�\u0017s��xjyl�\u0011r�lā�`#�\u0018�2��=���\u0004(@�\u0018cK(��\t�^�A+�ѫ�a�~��fY�+���`M�æ0lD�=�O��\u001fY�J��>�Јö�z�Be�\u001f�ݑ1/h+�䤱\u0017\u000b\u000fQZ<ح�5=�F�Q�����\u001aE\u001c�,��(R��<�=\u001b�(�\u0014���P�23�gD�ϩ�4�\t1�0\u0001�5\u0012���V̵H\r$��$=�\u0000:\u0011P8�=E�󘸕��b`���\u0018\u000fX@-���@L��\f٬Q�t\u0002�ڎ/��.�Z\u001a�ok\u001a\r�7�$��&'\b�}�$ ����ܽ�\u001f�\u001ay\u001fIG�+8zn\u0016%�d�\bv��Y+�D��EΜ���\u000eϋ�@�B���l�\u0018�O_�W_)�S��*�7Q��7\r�܇�@_<{?�\u0013�N\"m(��1`K+M�ǿ\u0014\u0010�IB�\u001a)�E�i4��\u0006=M��\u0019Sh��0O���ЧL\u001c�n\u0000\u0000��V�Ɔ����zU�,��\u0018ٟ��@{C>�G����:\n'=A]��\u0018��S#w��F\u001f9Yl�\u001c���|<�L\u0007y�2�9�%|`~��D�1\u001f�Vq%�\u001f�%c䱌5�n�\u0018K�\u001f<���R\fk��(N�7�7��l�K�r\u0010{|���*t�\u0015\u000bɶ�6���[lC�П\u001d\u001ei�[�Ę=5�|�y\u001au�n��a7&DB=�O��\u001d\u0007�=\u0006�IB{GƱܶ�6cΡ�̪e�\t�%\u0015ܦ�_� a��\"f̐��D�rV�����=8��ϸ[�BX+���B�\bO�\u001e���\\�&b\u001a�\u001d�+�\u0005i��\fI4v�Ŀz~�����wnl��l���m�KpV�<��.��\u001b��*�.y�o\u0001㶱l�(���v%MFl�$2��O\u0004��6��Z�/�8���D��@�s����\"��ET�8]e�\u0010\u0012���KJ�c�������S�)7��!^d�ԉ��џ5�1�:����xV��Pu<�\u001f�\u0015G����\t�8��E�(B��\u0012�b&��KҊ�\u0010���r,�\u0005���-���}�\u000e�[�\u0017,=ׅ�(&�1\u00110N9&yG:�`����41��d\u0003|\u0004�\u0016M5� \u000f8��$W�����M[�. \u0017�\\���\u0005G\"�\u001f��S�>2&\\x\u001c���J���u�\u001b\u0011�su�ǩ��\u001e\u001d�FI�s�Ù����9\u0000l���V�֧\u001a��Z7�\u000b�cA��2I�r��5�\u0012Q|<ޡ/캂v']�+P\u0017�b�k,\u0019�\b�CӅ\u001bn\u0007\f�n*\u0002o\u0001%\u00022�H\u0015\u0006vh5B�\u0001�'i�O�2q'�\u0004d��\u0019A^!&����V\u001b9��O��(�)\u0000���\u001a-%�t�\u0018��\n�n�s>�,ImK;�N���-l �L���]�0��B\u0002��^��.p�=�DWr�V`�q�\u0017��aȈ,ʯg\u0017��Ϯ8G.�\u0005���H/\u001b��KfC��d�aPn\f����\u0006�[�ع���(�\u000f�A��"
+              }
+            ],
+            "path": ".//.git/objects/c1",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "c8",
+            "children": [
+              {
+                "type": "file",
+                "name": "72ca652c01b7c3cee1130c38c2d27d4dabcbbd",
+                "children": null,
+                "path": ".//.git/objects/c8/72ca652c01b7c3cee1130c38c2d27d4dabcbbd",
+                "content": "x\u0001}V�n�6\u0010��_1@��Ѡ�^7�nw\u000f�n\u0013\u0017Ao���D�\u0012\u0005���h�A�KbI�p�7oX;_�/??<�tG/�=���>\u001fyLq��^�`�T���z��MH�\u000f�P�ڊ��.Ϸ�\u001b?&cG\u000e��8��r|��;�!�qzȀ`&�p֨yqb3PcF\u001a}�h�ɝ��ƶL�S|��F.1��\u0002�s��ȸ�X��6��K��\u0002+���]K��&\u001e)�\u0001�,�HM�3\r�6�=�\\�X��p\u001c�s�d�Xm6���u�Ùq�\n�y2\u0016�kM�{�g>Z>��S�q�&�#o6�2l�)���П\u0002�\u001d\u001b7���G\u0014$L��\u0010P\u0002��\b��\u0000I��`�8��cs�tU��B��#��\u0002WP�kAڏȶ�3���+�3�\u0017Rz\u0006~\u001eP\u0007\u001a�\u0013J�t�yD��Fn8F\u0013�;��\u0003�\u00116\u0016&�#hJ�h�7�;@q�Z\u0006(�*�Dw�˪ZP.���\u0013+�twwG{��ѿ\u0003��{��<Wt�A\u0004��#j� ���=L\u001e�N&�Eđ<���\fl��%\u0019\u0014u���Eފu.�\\\u0005��\u001b�\u0003\r\u0010�\u000b\u001d̻\u001d�a!H�k�\\�Qer%��\u0004A\u0006$\u0018�\u0001�\u001d}K\u0017��{� \\�/�T�9���3�O(D�)��\"�\u0003�\u0010dt����\u0018�GDCC;�!�QT�Մ\u0010��]�\u000ex��[��\u0010c��XF�9��'Q�� �d9f��\u0002�E X+�\u0006\u0016[:1\r\u0006\n4\u0000�7�P���KY�fEL�\u0011�'��ὲ\u001f�cP\r��؊��\u0018\fX�\"��hK\n��A�P\u000e@��c��c��v=\u0004�C�\u001aU�V��G+����~G�L��[g�\u001e4���\u001f\u0018m\u0012�\f����l�\b��cm�o�`�ۖ\u0006\u001b\u0017�qrj����ֹ�}�l\u0003��s\u0016\u0004*hh�R/��#P\u0014M^��G��\fb_⮢\t?\u001efQ��ba��\u00196X!�3MsJ\u0017'G���,8]\u000f�ѣ\u00143b��종��\u0016���$\rN'\u001f�h��\t��8\u0000�A�\f�\"^cn\u0018�zb\u001c�-���\u000e\t�\u0014\u0001\u0001\u000b\u0018\u0019�\b\u000et\u0010�V�U\u001a\r�!m\u001c���@�U�7���\u0011/܂����\u001c��\u0012Q\u0012�� �����\b|�G�f��\u001f���X�#�E|`2o��\u0019\u001d$h��N\u001a7�h`��\u0000��)�>͘��\n�f���O�~\\ht&؃En2Ɛ�ȝOV�E7�Z?'�#ߍ4\f\u0016���͈\u0016��\r�Ec1�0�\u0000�����޸\n\u001b��\tl0��㟳qR�K��\u001dZ��W\u0011-�Z\u0018+\u0003WL]\u0004�Ƕ����o\t&\u0011i\u0011�V\u0019aȒ��^\u0004��ȓ\f\u0010+DʱO�<d[D�y��K���2B\u0016�.c;O\u0012�0zH�=�\u0000��0�X\u001bZd1\u0019���v��)xm�\\ɵIo�F���r��\u0000���΋�}\u0001n�[\u001c�:P�\u0004\u0004\u0006\u0005�[�\\#�v�;\u0010���AOi�B�e~���K�r���̫��r���`��\u0013��\u00184O�f��w+ve��Ī�\u0015r���BmS�E�ct��T��\\�U}���\u0001W�t�)��\u0015��/��C�}r�\u0012˸J�y��\u0000���9/N%}cC3\u000f���U�z�'6�ָ����׿��\u0005%�J�\u0004^�\u001f?�9�Z��&��4���wa��?^5����▸���\u0003i\u0014 \u0010"
+              }
+            ],
+            "path": ".//.git/objects/c8",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "d7",
+            "children": [
+              {
+                "type": "file",
+                "name": "ab42491c122aa8c7f01d72f6f871e6398d2640",
+                "children": null,
+                "path": ".//.git/objects/d7/ab42491c122aa8c7f01d72f6f871e6398d2640",
+                "content": "x\u0001��[o�H����~E\u0002~\u0018@��}�y1\u0016\u0003Ȳ�֢��Z�6�X,��#\u0016YË�\u001a���w\"2I�$c{������Kd\\N���jV�ǟ������W��˻,���իp�P�\u000feqX,^�~�X��yӮ�z\u0013�&��\"����\u000b�\f�8Ճ�\b\u0019�����˜.\u0016?���Y\u000fy\u001f�f�}�l\u0016?���}[�ӓ���e��Ů��Ӑ�g��1��UCY���Ͽ\nm�o��I�iX~i��ehڰ�#��by�X|)�mX�\u0013��q޾m\u001e��C�����n��u���K~\u0014y_65?��پ���·\u001c��\u000b��~\f}����P�u\u0013�\u000f��h�Іu����ɛ\u001a=v�\b\"���mh�L�?Gqf\u0012�mօ����^�`�C֮��5��ߢ|�x\u001d�OT�\f�ײ�;�\u0019�\u0016�P5�\u0015R�f�\u000f\u001d���4M��ɪ��3{l��^ZN\u0006O��i�u��Lb��Zb�\r�]YUv��⮬K�QG��\u0005��\u0015���c��e�?��*�GD�\u0010�2ݶ\u0019�5Jy(\u0016���0��bT�2t}V�����f�\u0015�27]K\bt]\u0016\u000f>i�Y\u0019�e�e8�\u0001o���nߴ,�ۻ��3�O25C�9؝�x��\u0014\u0017��L\u001d��\",�\u000f]��3�@а)��*j\u0014��p{��\u0011W\u0004�\f�\u001f��ix��\u000b�3\u0007�y�����n[�c���.!�j9c�U�P�\u0016�O�@Zn_4����ٮ��U�F݈e��-NCi��7]W���2�\u0016+T.G\u0012�cB>V�\r�m�%\f�\u001a\u0007���\u0018�mvsM!d%WA�\u000f�W��\u000013i�pk��P˃�-3d9\u0006�j�f;΃�w��}��q\u0004��\u0013�\u0016�r\u001d~k\u001d�Ǉ�����.��{~�X�4�a��E�1���Y���\u0000\f�\b)�*X��/�\u001cY\u000b6�^�O�G��Ʈ�΀p�S�\f�ꐂF��r\u0014�\u0004�5\u0007I-�\t>V�?n��|y&ض\u001e_(�ݹ���=B[v��C\u0007�Zt���*�\\'G�J��]�#I ?\u0016�o��6��1�Q\tf�QAI����\u0015[e�K���\fA�(�\u0010�xU8�N�D�7��lv����{��G��tv��=���S��l�xM�t��\u001c�\u00064�P\u0007\u001c^~�\u0016\u0015茂�\u0012w�M�\f��p�2l-�mH�\u001b��T�T��\nZG���I�r\u0016\f��\u0014\u000e\u001f''�rr�l��(@-Ĺ�u��f\b& FE��.�\\yM��\u0003΃7���3��w�Z�wWd����5C�c@�oi�g\u0004��%��g-�ٖY��mQ�AiW���\u0011kJ#d�ǰi\u001a���f\u001bE�-�\u0019�\u0017]'���\f\u0011\u0003�Yu�\r�\u0015�_�Bod�e�pO\u0017\u000e\u0000''S�EOQ���)����\u0000�\n��2�B�В�H%%0Ŏ�b�s\u001c�M��o�zCZ���R��&��~1/�\u0001�\u001b�\u001a���\u001e�+ \u000e@���\u0000\u0019Q���R�\u0011\u00187��\u0012�Ĥ` �\u001e����M��N����,\u0019y[� g��\u0011�\\��\u001c\u0018\u0001�\r�]\\�\u0002�C��/\u0004O�.�\u0018\u0003�>�_Y:R�ﮢ�)�=kvx�>\u0002ᕢV�\tN�)���\u0015�!��Et���:\n�\u001cj\\�CK�\b�ojO\u001c{�\u001f�&T~\"\n�L��#���c�\f�h����Ͷ\u0000�\u001e��\"��,�!�޹@ySU٪iY�S���\u0018�mSqJ����_�\u0011��j����m��\u0001^\u0012I)y㱋\u0007�e�\u0012��Hd�\u0000�Ը���\u0010�\b\u0010\u0001���)r�������x\u000b��ȏy��z�DH0W�e���4\f��\u000e���\u0018'\u001d%H;\u0018eE\u0006�\u0019[���\b�U�j3r�W\r��8�m\r\u0013�\u001a\u0019�,\u0018ĤC�G���\u000e\u0018��ń3��i��:��'8\u000en�$&eA\u0013���\u0001\\˺{�]�\u0015ɷS�6����Г\u0013�\u0014���$�S&�E�3s�5w̽U6 �\u0000G�W\u0005���)�]\u000f�z�\u0015�:�7��$�.��;�rn.�N�W)�֠\u001aJ���[51�lǚ���p؊�D��I��Ŷ�~_\b�o���!��d�Q��\u0014�;\u001eL\u0011����=\u0012dBEtf\u000b)��\u0013-1�!�:�^�{�'��$:+�xx�����\u001c\u001eB�\b������\u001d,۴\u00006�4]���PL�U�\\\u0010\u0017Tl���N�ތ�Z�I{��p\\��\u0012��=�s'�lC�G=(�x3B�.;r��}�h�\u0016;\u0011*X[a�)��\u001e��\u0004�}\rg\u0003\u0010�\u0012P0\u0013��֕Pn�������\u001b�:nٳh\u0003��t\u0004��\r.�Q���\u000f?�`{�ܢ\u001eV3�)[���GE�;���9#\u000b�\u001e�&N���g���X���/\u0019~�nb:���\\\u0005@<VB�@�Ɉb�:H[,B���\u001d�\"����'�*{tѴ\u001e]��\u001c�����{��e-U�\u001c��\u0010\u0012BuX��X����\u001a���u��{�\u0016J���\u000f��~b�\\�ķP�l��\u001a�\u0014Y�}1�ݛc%D�i��\u0018����,\u001d��/�q�pvw��a8�oڒ����}\u0001-�k��Y��~a�+�\fT\u0003�:izP!�\t��.\u0016�)��\u001c*��UvՅ�G\u0006m���3}��_�$\u0012�w�I�\u0010��u�ji�R�'�_R�\u0012\u0005J66;�&�l�[\u001aX��\u0018�-\"�\u0000\u001bu�\u0000$���)�\u0001D\nTQ��7�Ed\u0017����\bk�5y\u00104:5\u0014�(g�o\u00046+��Pc��(��X�nǚ�\u0018\u001dt#w����j�&{�K\u00047��Ǆ⬝����}.�<��4.�\fL6Ǭ�\u0000��*0���(�dשaB\u000f\n�E��\u001e�\u001a>�-}��`��G���_�%!��\t\u00123i\u0000P�m!��i�b�\u00196D0�=�b�\b\n�m�\u0006T���\u001do/��M�\u000b�V\u001e�c�������̭QBE\u000e/�r~ڎCG'��G�%i��\u001d��9 *���p�*���?��7�?��W��\u000fS�p��Aon�>�\u000fWo������\u001f�52[����~{�qLF%��$Gv�|n�\u0016�ݗ�W�5�\u0014\tW��6~;\u001b�\u001d$kM�nHb*�/\u001f��\u0014�\u0001�F=�BT�V%\u0015:l��Q\u000fJk�NP\"5\u0017\u001c�9��\u0017mE/���H�<��r�l�\u0001X����0��D�S�xv)\u00012�H��$�J�\u0004�^�A)�Q��a�~��zY^\u0015��1X#�.\f\u000bQ�h\r�'�;\u000bZ�RҐ\u0019�8lK��'*��h�\u000e�<��|��z-�ܻ�xpX�w��꠺@q6�Y\u0015�8<(��(R+�<�=k�\bk2�z\u0001\u0014\u001d�\u0016�\u0013\"�}*3�dB���\u0000�\u001a�q�_y����&���]֝�G+(�\bȂ�\u001e#�iL�H�7\u001e\u0018��8�\u0003\u0016P\t-��!&ZzD��רf:\u0001ri��ۆ*�J\u001a�o+\u001aMk�&\u0010zc�\u0013�Ӻ�\u0011�1^���\u000f�#�:�\u0013�HW\u0005��&Q<'�G��|�J�G\u0000g�9���\u001d��@�B��24D\fѧ\u0017��7��\b6P��M\u0014�/���Hẹ�.^|\u001c�\tJ'�6\u000e��6`K)M�ǿ\u0014\u0010�IB�\u001c)�\u0005��jvw����Ɍ)m��0O�����L\u001c߮Q\u0000ރ��\r9A\u001dEժ\u0010Y\u0014Oad�V�ӛ�S{�\u001bflב8�\t�r��`�;u�¥��ɼ\u0000\u000bd���x�\u00197*�\u000f��\u0010����\u0001\u000f�tc>���Jv��%c���a�B�U�\u001f\nb�GA\fs��Ȏ�ov���,�KC9�=�`]N%�Ғ�dۖ\u001b�^�-�!M��\u000e�4�\u001b�\u00190&OM%�\r���X-�\u001evaB$T��\u0004\u0007�e\u0003�Ơ<��ށ8�m�r3b\u000e�d:Z:>!�\"�[���\u0011$,7YČ\u0019����[B�y\u000b�\\~أ���+��RH��0[]Z������b���bGLm���bU����\u0010���#����ϗ�݆�4ӳym#�1/�Y-�ugEߐw��u��z���E�J��\u0019�v��pZ>\u0012L\u0002�\u0004�N\t^x;���L��@�s��ZiΣS\u0012�3�g�5�\u0004<\u0014U�\u001d�]1:�[�_��V�zJ�r�e���\b��kj�Yq�\u0001��D$��^\u001d�C�q�?��[�B~��a�?�x�2��\u00162�S�x��\u0000��\f\u0001\u0015L�)�=\u0015خ'F��Z����\u001d�7�\u0017�\u000bn\u000b�.&�1\u0013л\u001c3��\u0019���LPnj��\u0017w6���.���\u001aw�\u0001�/!�j�:�3Դi��q9��A�Bڈ��:Z9V�#a�Ϊ�,uլ��]�\u0015|�bsj\u001aJӣ�=��4=\u00058��[\u000e��A��YL�Bn\rU�%��q���\\�N�\u0010��\"��ҝk\u001a\u0018q�\u001f�7�K���ډ\u0017�ӥ�X\u0017\u0015��\u001b�q�?t߆ס\u000657\u0015�7(�\u00152;�\u0012\f��R��\u0002�N:I�%�ĕ���^=1��BD*��K�M�j9\u001c�]C'Y�q��'�u�p1�0�4%�\u001bo��$�R��Ng'�F�-�\u001f��q�ݴБ$A���\u0017\u0011�ۆ���\u0015���*��G���^�a\u0000D�?�׋sJ�'7�#�y�mw4�e��xEkh����d\u0018\u000e'd�Nq�Ӽ\r\u000f]�-Y��,��b@��--���-I�f\t���;\u0016��\"���(#�@8D��=\u000bG�<)���6\f�[�E�d<k�A\u0016�)�:�>�~���\u001a�0�ާ9�\u001b[�|�\u0005�5T4(�JRk���\u0014�\u001e\rJ�\u0003�*C\u0007q�x!k\f��`�_\u0011\u0003\u0014x�0b\t˥�RKg$����#1��\u0011.\u0015�R�}k�\"~F��\u001d\u001c \u0015I�\u0004z�\u0017�d��Z^=9�>���\u0000;��7*�aK\u000b�6��t\u001alq��*���~f8��xh�v�ݺ�m8��]\u0013\u0005�\u0014n\u0001\u0015���\n\u0000�?�$�\u0001LbD���\u0010\u0017���\u0018�P����\u0002�� G�FMZ�W1M��D�ZU<7Ak�7�\u0006dЁ%_���b`$\u0013#�E�\u001f1q|��U�p��\u001d�\u001e2�\t���H�^q���id{uUal\u000f�?\u0006D\u001dR#\u0018���8���\u000bv蔧&�<�\u001a��5BB1\u0014�\u001e���\u0006�c�N]�8\rE\u0017�\u000b!${�\u0010��n�${�M�V'F�\u0010�M.��&+�����)\u001d=�R\u000b>5��;���R����u\\\nr+k�J=W\u0006f${MHE��\u000f�\u0016�sL�X\rs0��ȁ��\u001c\u000e�)�rǯ��A�/#dQ�}\u00183���S+�%V,#�����\\(I:o��l>\tn\u001fr�\t��h~�2�Ȕ���>TI��\u001a\u0013}WJ�������\u0002�p\u0006e�\u000bѝ�5-O�\u0018\u001a���ݻ��1�R�G�ν�*~������¸�!�|G��\u0012�!�-\u0007y��D\u0002�M�x,\u0006��(���y;�\u001d�Nq`\f EB��?a�5%\u0011�\u0007�O4��E���ƫB\u000b� �2[LmL]�yI�\u000b��||�M,\u0013�,6\u001f�Ϻ��ne��N���A]T5�d�IT��3\u0019\u00138\u0018E�5+5R�I�,�\u0005�#}�f�3m�z���Q\u0001$�/64\n��ΓQ��hj��[.9^�+�O�$�\u0011I�\u001b9�}b('X���\u0001t�\f����Mk�8�t�^_�=\u001b�߿�\u0007ntP.����L��o\u000b(GW0@g{\u0018*]\u0007�I�>D�`M\u0011�{��D,Sx�r���\u0002��O�,�lxG�\u0007\u0015�\u0001-N'�x0���c�V�\\�X0v��H\n/ݥ�f�*��\u0001\u0005����:`�\u0006��U4�ō\r\u0015\r�r擦���Z��3l�\fU�\u000fx~gA�ò�\bl�l4^�z=j_\u0018�\r@�\u001e�yR\u0017\u0002�>�L�\fQ����\u001fY]*և\u001d\u0011�\u001dƏ$�kUԴ��\u0013�\u001d�AGw��4_\u0003��$�\u0017�s�!\u0013���wlKK���hq���\u000b�����K�uc���|{i�g���0u���?�OM\bZ�|��@���e\"\u000f�o/��a\u000f�&8g����\u0014-\u001c#7����3\b}\u0017����sH��>�3�4�Q,|A!�5���=oߟzYZ=�&��\u0012\f#���H�O xfm��>K2n�[̇������\rB%n��q�T\u000e��a��;|�s7��}\f��=P� ]q��{��2�\u001e+-�mjGA�=�1�_��)\u000b��9F���q%�\u0017~�\u000b��&r�9�)���\u00167\u0019���7i\u001f*8��Ő��)G�D�կ�E�,�\u0014�S\u0000d\u0018\u0012 \u0012�J��uɉ\r\u001f\u0011{�\u0007�\u0016���L�t�!�XL4�.��M�K\u0011�E:��ˁn\u000e��G�JХܳ�i��ԣ ��|\u0006v�?]_~������=۟���\u0000\u0005l��"
+              }
+            ],
+            "path": ".//.git/objects/d7",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "d8",
+            "children": [
+              {
+                "type": "file",
+                "name": "825830678bfa36e3af3020a36680c416399aff",
+                "children": null,
+                "path": ".//.git/objects/d8/825830678bfa36e3af3020a36680c416399aff",
+                "content": "x\u0001K��OR04fPVVp,*�LKL.)�\u0002\u0000A�\u00065"
+              }
+            ],
+            "path": ".//.git/objects/d8",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "dc",
+            "children": [
+              {
+                "type": "file",
+                "name": "546537287109a943033c73668abe6fde88bb81",
+                "children": null,
+                "path": ".//.git/objects/dc/546537287109a943033c73668abe6fde88bb81",
+                "content": "x\u0001+)JMU�0e040031Q00T�/K-*�L-��MaX�|\"��)��\u001d����_�K�~�\u0006Si��XT����\\R\fRz}�����֊�\u001fd���(|f٫�\u0000\u0000�`\"f"
+              }
+            ],
+            "path": ".//.git/objects/dc",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "e2",
+            "children": [
+              {
+                "type": "file",
+                "name": "83c75067273ef71fe90161b3c303f8d467314c",
+                "children": null,
+                "path": ".//.git/objects/e2/83c75067273ef71fe90161b3c303f8d467314c",
+                "content": "x\u0001��Qj� \u0010@��)�l�hf\u0015��\u001eet&�P��\u0018��o�\u0015��\u001e<^���\u001dF��z\u0013\u0001\u0011M�6�cg���:ƈ\u0001��qL\u0018�\u000f\u0016Q�NM�\u000es0>\"�\u0018\u0003�t'\nspb��2�3�PL�pTt��6�hY����|�X��^wxġ\f�B�����Bk\u001eR-\u001f`�L� N\u001e�5j�.z�v�I}1\u000b\u0003A\u0013��S[f�[�3ux�\u000bɋʞE�\u0002b�\\\r"
+              }
+            ],
+            "path": ".//.git/objects/e2",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "e8",
+            "children": [
+              {
+                "type": "file",
+                "name": "fe3b47318111b92ef81cb11426eeef7a83f510",
+                "children": null,
+                "path": ".//.git/objects/e8/fe3b47318111b92ef81cb11426eeef7a83f510",
+                "content": "x\u0001mVMs�6\f�Y�\u000239t������������v�6ӛ(\n�XS�JRv�_�\u0007R��l\u000f�L�\u0004\u001e\u001e\u001e\u00006�7���Ǐ?\\\\�uHf�t�Uu��\u0003���cU]k�Ck܎���1=�0��i4-��E`R�����ĺ�~�����Q'�Qzo������!\u0018w~s��\u0007�\u0003��Қ�^-g���?[%�����\u001f�R�!pġ���ه}M>P���#כ�z6��z9X��sC�\u0007���wIOA�8\u0000��',\u001f�`��wX\\�jH*/��r�\u001c�W�D�C\u000f�G�֓��I��1P�����\u000e\u0014�l\u0004�~Q�#��\u0004^Mp^!�NEҾ�M\u00122`�B\u001b)��S\u0007�a��w���/&�(>��H���+�$��-!\u001dJ���?yek���3��$���ؒ���\f;q+0���\u001aks��\u001do�3B��~�\u001d#\u0015=���\u001d�0\u0001��\u0019�5�\u0004�\b\"K&v~�-H9pU}\u0016�e\u001c�\u000bA5Ť\u001c\b�� ��qkt�Z@�kÇrh�X��Cf\u0010�\u0011j\u0011Ц\u001f|�����$����ɏ\t�w)�w�C�\u000bR\u001c[r\u0004\u00030�ǘp2�,\f��\u001d'j؁\f�\u0004�cO\u000e�A�H҇\u0011�Z�Aim\u001c��\u0001��\u001b��2vf�E=�^��VN���գ�\f@������~�\f����%��\u0016T\u0003V�uv�&�Y\u0018|���\t\u0010�\u00022`\u000b�\u0019B�\u0007їq\u001eu�yE\t�1\u0004\"�X�����L\u0001�\u0015����*LN��U:�BҢ�щzb�\u0013�5l�\u0017j^T�x�v+58X�\u000f\u0011���\n�u)��Z�6��-r@~\u0013�S��x���'�\u0011\u001boF�b���\u0004�\u001f�0˰�j礁��Hx\u0011?\u000ej�\u000b\u001ay�cn�-ޢ��]\tRڢ<��\u0001\u0011�o�(�%i�:\u001a�?�\u0004m�<\u000ed���@B�l~�\u000f\n&�Rf��,b�*+���*XfwIB\u0012@%,��)�2i�f!!�r!h�\u0017٢�d+�����2\u001d0+8�T�\r�V{�\u0012�>\u0016\u000b�NO�?-��|.y\u0011��@�\u0010~T�uζ�@ju�e�\\^� \u001c\u001af\u000e�\b���\u0003[tf\u0010\u0004�\u0014I�\u001f�\r=��l+�s\u0017�G��T�����up�\bM��#\u001bʍI�Di\u001d��둲Z}g�1�c\u0001��IH'?R\u0006��\u0002�K\u0001\"RnQ�i�x��\r��}�w[�*�#+Ɍ����\u0012\u0012\b����;\u0014bً�\u0006�\u0005H3\u00185�v�v@�.\u0014�\r\u001d��#\u0004��D;�\u00116��vR�O؏\u001d�c\u0014�[(C.\u0005o��\u0016d5�~a\u000b�a��S��QQ\u001a�ju���iB�Z���j5\u0017xd�<OA)�c�|�\u00181hS�\b*F�!�0\u0017���a$�ٰP��eF���4��\u0000�\u001b�\u001a�\u0018�I�\u0004.\rhA\u0012gi�S\u0017[���x˗��l9��FMJ\u001b��D��t�\u000f��\\�d��X\u0014f��A�0m\u0007��T�\u001a\u0006\u001cr?�̅t�Jt!��\u0000��\u0002V��\u0005��k\u0006\u0010�)��\u0015�L�L�\bu\fS#�\"U+��>�G�Iቻ\u001f�\"$R���TU_'��� I\u0004-�\u0002��]\u0019\u001c\u0003�\u001fjM��;(��?��`"
+              }
+            ],
+            "path": ".//.git/objects/e8",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "ee",
+            "children": [
+              {
+                "type": "file",
+                "name": "0aa410154d437f5d0bbb696d1822c6bc89366e",
+                "children": null,
+                "path": ".//.git/objects/ee/0aa410154d437f5d0bbb696d1822c6bc89366e",
+                "content": "x\u0001+)JMU�0e040031Q00T�/K-*�L-��MaX�|\"��)��\u001d����_�K�~�\u0006Si��XT����\\R\fR�cB��n���w~͹{��&�<�U�\u0000�$�"
+              }
+            ],
+            "path": ".//.git/objects/ee",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "f8",
+            "children": [
+              {
+                "type": "file",
+                "name": "906236bb4a68bfdcfa9cddd2e3b24f6e27aa6f",
+                "children": null,
+                "path": ".//.git/objects/f8/906236bb4a68bfdcfa9cddd2e3b24f6e27aa6f",
+                "content": "x\u0001mWے�6\u0012�3�\u0002U~�*�<��y�}�\u0019_����L��7�$$a\u0005\u0012\f\u0000J���=�\u0001P\u001a;U�e^ЗӧO7[�[��O����\u0017/�mHv��\u0014��\u0005.?\u001dM8Zsj�ۮ��N%��ި�.̃z?�ެy#\u0018���5�-&�M���\u001c|?wI��������F=L���;�o�Ǳ\u000bf0cZ+}�˙�6�W�ʎ����\u001f��`�`\"\u000eŵ�|��Q>�͟��fs�4_mګ�rp�.����:\"���1�1N�|�θ��\u000b�%�G\\��zJZ.��r�&�A�g�L\u0018��dT����#���z��^~:?\u0002�(F\u0010�[���\n��K8W\u0011������`\u0013����\u000e}T�\u000f&�\u0001>L�T�o �(�dc��YrSZ9�Z!J���2�c����{�݆��\u001e�Z��3ǂ�זcKu6�ְ��\u0019�vv[��yc�v������A)\u0006\u0003��9*a\u0003��5kg�\u0019�#\t�L����\u0000�h��\u0003\u0019&q�/\u0000mTLz\u0004@[\u001f��\u001b��N�f\u0010�ښc>�C�x��\u001e�A.'��A�a�\u0001&�<Ӊ������r�;��\u001b���%R\u001c[j\u0004\u00030��1�d�B\f\u0004�v&�֌\u0000\u0003 ��xG�k�8,�4�Zku�]gGC*#�\u0011�@�μ�{;UR׷\u0017/��#��i��N\u0010\u00007��jn2~r\u0006�=�ݘl�{@��䭋������c�-N\u0000�\u0014P\u0001��!�~ ����ׂ+Z\u0000�!\u0011F_rEq�\u001f��B��4\u0001�G�*L\u0016q�*�r�4�2�dO��\u0004����\u0011�'= \u001fD�e\u000fN\u000e��\u0004@+�\u0003�/I\u001b\\�\u000e��Ύ���2\u001dP߄���w�\u001f��'�\"^�����\u000e\u0006\"\b} `��\u0016�ݤ\u000e�\u001a8\".�3�͵�Q�!�\b��\u000b%\u0003�L����6+ 2�͟\u00185�F�h鿸\u0004l�<\u000e���[\u0000!\f�6��\u000f\u0015l<\b�Nl�B!�\\�e\u0019�gV\u0019Ku��\u0012\u0003�i!�۝���V�i\u0017\u0010��\u000b@5�h\u001c4E�\\a\tS\u000fy:`V��J\u0003�&K�\u0005J\u0000��-\\�.�?.�K]>�\u0010�5\"NH?��Z��\u001a�Wk-3�IB�\u0010LI�\u0004��8(3\u0000\u0002K2�w��Ӎz\u0004\u0018bK�E���%ˎq>+\nP\u0007�\u000bш\u001f��(\u0011&�D����z��V�Y\u001f��b!��Ȕ�~V\u0012 ����r �r��O3�\u00036ݨ��=̻-`��h4+��\u000e~\u001e\u0013\n\b�e��\u001e\u001a1���\u0006�\u0005P3X]{{o�\u0004��\u0010>O\u001da]F\b&�Y��Gڠ�ޱS\u001f�>��L��\u00033�\u0014\u0010\u001b�Fn\u000b�*�O��\u001b&��tx\u001e\u0015Y\u0000V�˴\u0005N%���2vW���� �:\u0005�\u0012����1b!S�\b(�\u0003�Cm�n��\u001dFr��\t�s�\u0012�se&�\u0001&7h5�9�3�\u0004�\u0006H\u0010��\u0002YTl����&�K.6Ϣ�ѓ�\u0001՞��������\u000b\u0014'9ɢ1��\u0006����`/S�\b\u0006\u001c��ؔFzg4yAy��\u0003㶀�w�\t�˚��e�~g�����Č`�T��\u0013���\t�ďlR���g�\b�J��JM���\u0011�D��\u0017AM~̃c��C�Q��\t\u0005I��Kp\u0000- -��34�l-��\u001e�ɛ�P\u0011�2�s��g9��;�[\u001f`2�8\u001eǶp0{t�<�\\!�z;�K$v0��I�B��q�%�A\u0007\u000e\u0006��\\\u0004\u000eQ�&�w\r�\u001b��\"\u0000��\u0003;�6W�>��\u001cl\u0001�=y��l���\b\u0011\\�+Ӯ��j�z&\t�\u00111H�DP=Ⱥ�\u0018Df�4L�\"p\ri�M\u0016��y����[�M�y\u0016�F���$�G���\r���ƨ3\u0002��P\u001d�>�9N��5L|\u0012x\u0015\u0007j\u0003tM�C��\u001b��a�F\u000eo�\u0019�\u0014��V�)@[�*�8\t���,>��\u001a8���GN\u0003�\u0007�\u0011���\u0002�0S�6a��\u001e\u0015z��[��\u0010��n�ʭP\b���#]l�K��\u0006�.���I\u000f���CD��\\�`����k��^O���?SYek)\u0016\u0018�)P�\u0018;���;�3���\b��\u0010'�T�\u0012Q\u0019�ּs��y�'i\u0019\u0012Q>�p��EĂr`\b�\u0014�ph�xp���\u0005\b6�)X�\n�0o�_\f�\u0002_kX���%�i~�c��]�u^Ua\u0004�\u001c�\u0003Rt��;���,y��\f\u0019E\u0015�\b�%��Gd:\u001du�\u0010�l#�z��\u0016-/\u0005Z>�>Q�6(\u0007�,�r�\u0002��Jr� ,��\\ԏ\u001fC�\u0006\u0001?��?�z�J|quE�&�b\u0003J�[F\u000f�N��\u0010\u0006��{\r� �2</\u000b\tX5��3��>�\u001f\b9wm\u0006\u0016L�\u0014���\u0004��&L��w$u�u�C�\u0005�DY�9G��x�J�\u0003�OI\u0017|�ae�wܘ+�/31P��T�\u0018��CY���r\u000f���h;��\u001a����!�{�������}υ-߫Y�ec��\rX��\u001f7U�}"
+              }
+            ],
+            "path": ".//.git/objects/f8",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "f9",
+            "children": [
+              {
+                "type": "file",
+                "name": "18b66cbb9a8c7aa9f94e3130aaf4141abc0a62",
+                "children": null,
+                "path": ".//.git/objects/f9/18b66cbb9a8c7aa9f94e3130aaf4141abc0a62",
+                "content": "x\u0001��K��0\u0010\u0005g�S�~�i�\u001bA\b���[�XL$\u0005[�9��\\!�*(��^k\u0019���\u001a�\bD�:\u0006֒�\u000b�$�g�\u0001C&&\u0017mΔ�qbԓ6i\u0003�\u0019���|��b�6̙Y{��y�E��5־A���ӣ���)��;�\u0013.�T�}�����^�<&��\n����5:\u000b��\u0011�A��C>/���$A�Cv�\rh\u001b�x9�?�AV{"
+              }
+            ],
+            "path": ".//.git/objects/f9",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "fb",
+            "children": [
+              {
+                "type": "file",
+                "name": "a466db7bddbe998dcdbb930af55497fb749608",
+                "children": null,
+                "path": ".//.git/objects/fb/a466db7bddbe998dcdbb930af55497fb749608",
+                "content": "x\u0001��Qj� \u0010@��)�٠�Q\u0017J�\u001e��L6a��h��o�\u0015��\u001e<\u001e՜�\u000e6؏~�\u0000� �dȎ�&�.y$f�9��\u001cG�\u0017X��CJ\u0007�\u0011)��\u0007\u001bP�`fyh�̈́�\u001a���\u00074�T:�R\u000f(iY��������w�;|NC\u001eڒr���WN�6P�_p�Fg\u001d�\b7��V\u0017�~���������.\rj���|R�)�{���~\u0001��YY"
+              }
+            ],
+            "path": ".//.git/objects/fb",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "info",
+            "path": ".//.git/objects/info",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "pack",
+            "path": ".//.git/objects/pack",
+            "content": ""
+          }
+        ],
+        "path": ".//.git/objects",
+        "content": ""
+      },
+      {
+        "type": "folder",
+        "name": "refs",
+        "children": [
+          {
+            "type": "folder",
+            "name": "heads",
+            "children": [
+              {
+                "type": "file",
+                "name": "master",
+                "children": null,
+                "path": ".//.git/refs/heads/master",
+                "content": "58cfec9290c9bb4ad6d3bd3bc0eb616e4b2d8aba\n"
+              }
+            ],
+            "path": ".//.git/refs/heads",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "remotes",
+            "children": [
+              {
+                "type": "folder",
+                "name": "origin",
+                "children": [
+                  {
+                    "type": "file",
+                    "name": "master",
+                    "children": null,
+                    "path": ".//.git/refs/remotes/origin/master",
+                    "content": "58cfec9290c9bb4ad6d3bd3bc0eb616e4b2d8aba\n"
+                  }
+                ],
+                "path": ".//.git/refs/remotes/origin",
+                "content": ""
+              }
+            ],
+            "path": ".//.git/refs/remotes",
+            "content": ""
+          },
+          {
+            "type": "folder",
+            "name": "tags",
+            "path": ".//.git/refs/tags",
+            "content": ""
+          }
+        ],
+        "path": ".//.git/refs",
+        "content": ""
+      }
+    ],
+    "path": ".//.git",
+    "content": ""
+  },
+  {
+    "type": "file",
+    "name": "01 Overview",
+    "children": null,
+    "path": ".//01 Overview.md",
+    "content": "## Team Introduction\n\nLet's consider a company, used to sell their product through the super market. Now they want to set up a e-commerce solution, where they wan to sell the product directly to the consumer.\n\nSo they hire a team, along with a `scrum-master`, programmer, engineer, tester and marketing persons.\n\n### Agile Manifesto\n\nThe values and ideas of `Agile Manifesto` is derived from couple of broader range of frameworks, like\n\n- SCRUM\n- KANBAN\n- CRYSTAL\n- EXTREME PROGRAMMING\n\n`Agile Manifesto` uncovering better ways of developing software by\n\n- Doing it\n- Helping others do it\n\n`Agile Manifesto` values,\n\n- Both `Individuals` and `Interactions` over processes and tools. This implies that, `skilled` and `committed` people working together toward a common goal.\n- Working software over comprehensive documentation. This implies, primary focus is to build a working product\n- Customer collaboration over contract negotiation. This implies, between customer and producer, we do not want only the contract and the lawyers. We want,\n  - Building a trust\n  - A workable relationship\n  - Shared goal\n- Responding to change over following a plan. This brings the adaption and flexibility.\n\n> Although the Agile manifesto ideas are almost 20 years old, It not only applicable to the software development but other categories of products.\n\n### History\n\n- SCRUM used to use to the product development papers since 1986\n- Ken Schwaber and James Sutherland publish scrum framework 1995\n- Agile Manifesto was was first written back on 2001\n\n### SCRUM\n\nSCRUM is a framework for dealing complex product. Now-a-days, constant market condition changing and technological improvements, gives us higher level of uncertainty. With this uncertainty, it is impossible to predict how a product should be developed. In simpler term, we can not predict future and absolutely have no clue what can be customer requirements six months later after the product being developed. Spent six months to plan for a product and spent another 2 years to develop the product does not work anymore.\n\nSo to create a product with market value, we have to work with time box and adapt with new changes.\n\nWith these requirements, SCRUM provides,\n\n✅ Time boxes\n✅ Feedback loops\n✅ Dealing with uncertainty\n\n### Sprint\n\nA Sprint combines combines all the aspects of work, required to build a product. This provide output of working, tested and potentially shippable product, even though it might not be delivered to the end users.\n\nAfter a `sprint`, the team demonstrate what they have accomplished and what to do next. This short iterations allow constant feedback and considerably increase the probability of creating right product.\n\n**SCRUM Team**\n\nA SCRUM team consists of\n\n- SCRUM Master\n- Product Owner\n- Developers\n\n**Product Owner :** Created the list of features called, `Product Backlog`. This backlog list is organized in such a way, so the customer can get maximum value.\n\n**Sprint Planning :** During the spring planning, the developers will select top items from the backlog list. A sprint can not be longer than one month. The team do a collaboration daily called `SCRUM Meeting`. `SCRUM Meeting` is responsible for synchronize, identify problem and move forward.\n\nAt the end of the `SCRUM`, the product should be potentially shippable. The `SCRUM Team` along with the stakeholders, conduct a review on what is completed and what to do next.\n\nThe last event of the `Sprint` is to do the `Retrospective`. It involves, how the spring went and figured out improving development process.\n\nThen the team plan for next sprint and cycle begin again.\n"
+  },
+  {
+    "type": "file",
+    "name": "02 Artifacts",
+    "children": null,
+    "path": ".//02 Artifacts.md",
+    "content": "# Artifacts\n\n## Overview\n\n---\n\nAccording to the Scrum Guide, there are 3 artifacts,\n\n1. Product Backlog\n2. Sprint Backlog\n3. Increment, aka Product Increment\n\nArtifacts in SCRUM represents, `Work` or `Value`.\n\nWith `Artifacts`, SCRUM provides,\n\n- Transparency\n- Inspection\n- Adaptation\n\nSCRUM uses many terms, we do not use in our day to day conversation.\n\nEach of the 3 SCRUM `Artifacts` has commitment towards something.\n\n- `Product Backlog` exists to provide a long term objective, the `Product Goal`\n- `Spring Backlog` exists to provide the `Spring Goal`\n- `Increment` is committed to fulfill the `Definition of Done`, means the desired quality a product should have\n\nHere the `Commitment` stands for\n\n- Dedication to achieve the goal\n- Why the work is important\n- What is the desired outcome\n\n## Product Backlog\n\n---\n\nA product is something that customers use and get benefited. It could be a computer, vaccine or even a space-ship.\n\nWith computer customer can do calculation, with vaccine people make antibody and with space-ship, it is possible to travel space.\n\nWith SCRUM terminology these output or benefits from product is called the value.\n\nBacklog stands for list of unfinished work.\n\nFor example, if we plan for a tour, we have a list\n\n- Finalize the destination\n- Book hotels\n- Buy tickets\n- Take leaves, etc\n\nBefore tour, none of the items are done, and the are the backlog.\n\nNow we can not book tickets before the leave is confirmed. It's a risk. It will be a collision if we book tickets and can not take the leaves.\n\nAgain, we can not buy ticket or book hotel before select the destination.\n\nSo the order should be,\n\n- Take leaves\n- Select destination\n- Buy Tickets\n- Book Hotels\n\nNow, let's say, for tour destination and tour planning, we want to relay on a travel group. The tour group has multiple locations and plan for the tour. Here comes the **Transparency**. The tour group needs to know, you want a relax tour or adventure one. You prefer the sea or the mountain.\n\nWith these preference criteria, it is helpful for the tour group to provide a very good package.\n\nThe process of looking and observing all the plans aka `Backlog` is called **Inspection**.\n\nWith **Adaptation**, if we see something is wrong, missing or unclear we can change it.\n\nWith the **Inspection** and **Adaptation** SCRUM is continuously improved and it is called **Refinement**. This can be done by Q/A and adding things thats need to be done.\n\nA product backlog item can be,\n\n- Features\n- Improvement\n- Fixing\n\nEach product backlog item can contain,\n\n- Description\n- Order\n- Size\n- Value\n- Acceptance Criteria\n\nProduct owner is the responsible person for product backlog.\n\nProduct backlog is created on the objective of how the product should achieve. The product owner collaborate with the stakeholders to understand the business requirement, analysis the markets. There should be only one product goal at a time.\n\nAdding product backlog is an ongoing process. The product owner is responsible for add, update or remove product backlog any time wants. This make the product owner work closely with the developers. With product refinement, the product owner help the developers to break down the backlog into smaller task with details, size and order.\n\n**Sizing** is the estimation, developer is responsible of.\n\nTo reduce complexity, often the product owner and developer make the tradeoffs. And this is not the part of the SCRUM. The SCRUM team decides when and how the refinement should happen.\n\nThis is why the product backlog is never completed and always changing.\n\nThe top backlog items should be\n\n- Fit for the sprint\n- Immediately actionable\n- SCRUM team agree to make it done\n\n### Real World Example: Product Goal and Product Backlog\n\nLet's say we want to make a tour app that will display the events off upcoming tours of various tour group.\n\nFirst the `Product Owner` define the goal and create the backlog.\n\n**Product Goal:** Help 1000 tourist to find their next team.\n\n**Product Backlog:**\n\n- List of upcoming events\n- List of tour groups\n- Gather all the tour groups information available out there\n  - Facebook page\n  - Facebook group\n  - Corresponding persons\n- Easy Search and filter functionality of\n  - Groups\n  - Events\n    - By group\n    - By place\n    - By area\n    - By budget\n- Continuously gather all the events\n  - Place\n  - Group\n  - Page\n  - Budget\n  - Date\n\n### User Stories\n\nWhen the product owner added the product backlog, it do not mean a lot. To make sense, the product owner work closely with the developers and put necessary details.\n\nFrom product backlog, the `Product Owner`, `SCRUM Master` and `Developers` generate the `Backlog Item` with\n\n- Description\n- Order\n- Size\n- Value\n- Acceptance Criteria\n\nThe SCRUM guide itself, does not provide any template or recommendation, how a `Backlog Item` should be. It is very common to use the `User Stories` as `Backlog Item`. It is so common, the `Backlog Item` itself often refer as the `User Stories`.\n\nIn `User Stories`, commonly we put a short description, from a product user perspective, who desired the functionality.\n\nWhile writing a users stories, we go though a 3 step process, also known as 3 C's,\n\n- Card\n- Conversation\n- Confirmation\n\n**Card:** In the card, we usually refer a stories as followings\n\n> As a **< USER ROLE >**, I want **< SOME OBJECTIVE >**, so that **< SOME OUTCOME >**.\n\nHere the\n\n- `User Role` is the `WHO`\n- `Some Objective` is the `WHAT`\n- `Some Outcome` or benefit is the `WHY`\n\n**Conversation:** It's like reminder what need to done. It should be brief to the point.\n\n**Confirmation:** This determine the acceptance criteria.It's a way to test if the story is being completed.\n\nThe story does not always have to be the 3 C's. It should be decided by the SCRUM team which format works best. Ans yes, it is okay to use different story format in single project.\n\nEven `User Stories` are not a mandatory part of the SCRUM.\n\n### Real World Example: User Stories\n\nWe had a product backlog\n\n> List of upcoming events\n\nWe can transform this as a User stories as followings\n\nStory: As a customer, I want to see the list of upcoming tour events, so I can choose one and contact.\n\nDescription: The is the core feature. For each tour group, there should be list of events be entry into system. The customer will come and select one from them.\n\nAcceptance Criteria:\n\n- In the app, there should be list of events\n\n### Planning Poker\n\nHumans mind is more trained in comparing rather than measuring. With this context, In SCRUM for backlog items, instead of estimation, we are using the sizing terms.\n\nFor example, let's consider climbing a mountain. If this is a small hill, we consider the size 0 and for Everest it will be 100.\n\nEach developer will put a number between 1 to 100 for a backlog item. Then will be a brief discussion specially the highest and lowest scoring. This points the complexity and possibly the effective solution.\n\nThe initial sizing may have big difference between developes, but with brief discussion and repeat the precess, it is possible to come up a fixed sizing.\n\nEven with the discussion, we can reduce or change some objectives of the backlog, as long as the SPRINT Goal and the Product Goal is consistent.\n\nThis method is referred as `Planning Poker`.\n\n### Adding Value To Product Backlog\n\nAlong with the developers put the backlog estimation, the product owner need to put the backlog value as well. SCRUM mandates, each product backlog should have a value. I can be done by creating a simple value scale. In the scale, you can add multiple values starting from 100 to 1000. When we have different product backlog items, we can arranged them base on perceived values on the scale. And using the scale we can assign each product backlog items the value as expected.\n\n## Spring Backlog\n\n---\n\nDuring the `Spring` planning meeting, the `Product Owner` what needs to be done to increase the product values. By collaborating with the `Product Owner`, the developers will decide, which items of the top list of `Product Backlog`, should be added to the `Spring Backlog`.\n\nThe `Sprint Backlog` has a `Sprint Goal` to deliver the `Product Value Increment`.\n\nSince the developers are accountable for the `Sprint Backlog`, even the `Product Owner` can not change the `Sprint Backlog` without collaborating the developers.\n\nEach `Spring Backlog Item` comes from the decomposition of the `Product Backlog Items`.\n\nIn a `Sprint`,\n\n- `Sprint Backlog Items` or tasks are `What To Do`\n- `Spring Plan` is `How To Do`\n- `Spring Goal` is `Why To Do`\n\nAny unfinished work from the `Sprint Backlog` will be goes back to the `Product Backlog`.\n\n### Sprint Scope vs Sprint Goal\n\n---\n\nDuring a Sprint, the `Sprint Scope` can be changed, but we can not change the `Sprint Goal`.\n\nLet's go for an example. Let's say we are going for a trip in the next weekend. We are spent the whole weekend in the sea beach. Now, to do this, we have to do the packing, purchase train ticket and book a hotel. But due to some emergency, we may have to use bus as transport instead of bus and have to purchase bus ticket. See, here we are going to the beach for weekend with bus not by train.\n\nSo here,\n\n- Packing\n- Purchase ticket\n- Book hotel\n\nAre considered as the `Spring Scope`, but spending weekend in the sea beach is `Spring Goal`.\n\nTo meet the `Spring Goal`, we may make compromise in terms of the features but not the quality.\n\n## Product Increment\n\n---\n\n`Product Increment` is\n\n- A new version of product\n- Additive to all previous increments from all the previous `Sprints`.\n- Should be useable without needing any additional work\n\nThe commitment of `Product Increment` is `Definition of Done`. For `Definition of Done`, let's do an example,\n\nIn our app, as tourists, we want to display a list of upcoming events so they can contact the event host and join the event.\n\nWhen we convert this `Product Backlog` into `Sprint Backlog`, it will be\n\n- Show list of events\n- User can select and get the contact information of the event host\n\nNow, after completed the `Sprint Backlog`, if we missing the feature of adding event host contact information or do not show them, then, it is not completed aka does not meet the criteria of `Definition Of Done`.\n\nA sample of `Definition of Done` can be,\n\n- The acceptance criteria defined must meet\n- Code should be reviewed by at least 2 independent developers\n- Technical document should be written and reviewed\n- Unit test must be written and passed\n- Cross browser testing should be done at least 2 version with mobile view\n- Accessability test passing\n- Continuous Integration test passing\n- Non functional test\n  - Operation should be performed within certain defined time frame\n  - Should support certain defined con-current users\n  - Should check security vulnerabilities\n\nThe more experience the `Sprint Team` will be, the more strict rule should be in the `Definition of Done`. In the `Sprint Retrospective`, the team will discuss, how can increase the product quality aka the `Definition of Done`.\n\nIn this case, whenever a `Product Backlog Item` meets the `Definition of Done`, a new `Product Increment` happen.\n\nSCRUM only describe, there should be a `Definition Of Done` during the `Sprint Planning`. It does not define, when or what should be the `Definition Of Done`. The ideal time to update or refine the `Definition of Done` can be the `Sprint Retrospective`.\n\n### Definition of Done vs Acceptance Criteria\n\n| Definition of Done                             | Acceptance Criteria                 |\n| ---------------------------------------------- | ----------------------------------- |\n| Applicable to all the PBI                      | Applicable for a single PBI         |\n| Should perform and committed Product Increment | Might not perform Product Increment |\n| Created By SCRUM TEAM                          | Created by the developer            |\n| Mandatory option for SCRUM                     | Optional in SCRUM                   |\n\n## Summary of Artifacts\n\n`Product Owner` create the `Product Goal` and `Product Backlog`. Developers pick the `PBI` and plan for the Sprint with `Product Owner`. From `PBI`, developers are accountable for creating `SBI` and a SPRINT should have a `Spring Goal`. These `SBI` is forecasted, as `PBI` and `SBI` as both changes over time. When the Sprint is completed by the `Definition of Done`, then there should happen a `Product Increment`.\n\nHere, `SCRUM Master` is responsible for ensuring the `EMPIRICISM`\n\n- Transparency\n- Inspection\n- Adaptation\n"
+  },
+  {
+    "type": "file",
+    "name": "03 SCRUM Events",
+    "children": null,
+    "path": ".//03 SCRUM Events.md",
+    "content": "# SCRUM Events\n\n`Sprint` is the heart of the `SCRUM` and the `Sprint` is the container of all the SCRUM events. `SCRUM Event` is mandatory and SCRUM team can not simply decide to skip the events. To reduce the complexity, the `SCRUM Events` should happen same time and place.\n\nThe `Sprint` contains the following `SCRUM Events`\n\n- Spring Planning\n- Daily SCRUM\n- Sprint Review\n- Sprint Retrospective\n\nAll these events,\n\n- Are included inside a time frame\n- Provide the `Transparency` and `Inspection`\n\nThe SCRUM team is not only bound by the events, the team can held other meetings whenever necessary. For example, the `Product Backlog Refinement` meeting is not included into the `SCRUM Events`.\n\n### Time Box\n\n---\n\n`Time Box` force to focus on the most import tasks.\n\nFor `SCRUM Event` time box is very strict frame. For a `Sprint` like 1 month, the maximum time for `Sprint Planning` event is 8 hours or less. It can not exceed the 8 hours time frame.\n\nExcept the `Sprint` itself, time frame can be closed earlier. For `Sprint`, even though the `Sprint Backlog Item` closed earlier, the `Sprint` does not close before the `Sprint` time frame.\n\nFor example, for a tour, we may take half of the day for do the packing. `Sprint Time Box` suggest to do it in compact time frame, for example in 1 hour. It is possible we might forget to pack the tooth-brash. We buy the tooth-brash from somewhere, but it saves from bigger risk, miss the flight.\n\n### The Sprint\n\n---\n\nTypically a `Sprint` length is one month or less. The naming can be confused with `Sprint Race`, by putt all the energy in a `Sprint`. But in `SCRUM Sprint`, the development work must be performed in a sustainable peace, `Sprint` after `Sprint`.\n\nInstead of planning for a year, to reduce the complexity, risk and adaptation, its better to plan a short period and re-evaluated time to time.\n\nSprint allows the `Product Backlog Refinement` activity and other relevant meetings.\n\nDuring a `Sprint`, the `Sprint Scope` can be clarified and re-negotiated, without\n\n- Making any changes that may endanger the `Sprint Goal`\n- Decrease the `Quality Standards`\n\nDuration of the `Sprint` should not be changed during or after `Sprint`. The `Sprint Scopes` that does not meet the `Definition of Done`, must be go back to the `Product Backlog`.\n\n### Sprint Planning\n\n---\n\nIt is the first event of the `Sprint`, best to held same time and place. For a `Sprint` that length is 1 month, the `Sprint Planning` should be 8 hours long. For the smaller length of `Sprint`, the `Sprint Planning` time should be less.\n\nIt is not necessary to happen the `Sprint Retrospective` and `Sprint Planning` happening in the same day. The `Spring Retrospective` belongs to the previous `Sprint` and the `Sprint Planning` belongs to the current `Sprint`.\n\nIt is important to consider, the `Sprint` should never be delayed in any circumstance.\n\nThe `Spring Planning` describe\n\n- WHY the Sprint is valuable\n- WHAT needs to be done during the Sprint\n- HOW the work will be done\n"
+  }
+]

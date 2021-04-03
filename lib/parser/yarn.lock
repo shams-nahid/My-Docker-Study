@@ -225,10 +225,10 @@ ipaddr.js@1.9.1:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.9.1.tgz#bff38543eeb8984825079ff3a2a8e6cbd46781b3"
   integrity sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==
 
-markdown-blog-content-parser@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/markdown-blog-content-parser/-/markdown-blog-content-parser-0.0.5.tgz#4f2de4da38cc646ffa3f9c770cccfdc7a6ef2cf4"
-  integrity sha512-StgQoSsPpJNkU52or/oimxZXYKokd+Vd9ENlZfXg3v2IILFXME2xAZNkoMctTe+ene32BljJHcEzXjhWjUxz7g==
+markdown-blog-content-parser@0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/markdown-blog-content-parser/-/markdown-blog-content-parser-0.0.6.tgz#bb52fbd4f04243cc6828df39aa151d60edbc5a9f"
+  integrity sha512-uuQEb+6IbjSWvHHVlFOqI9na+TGq+9Ry1vLfZ4aLog+M/J8VSp2UCQvdaDFEyh6yjOrLDoQI+Jg+3fzlk/f1Zg==
   dependencies:
     cors "^2.8.5"
     directory-structure-json "^1.0.0"

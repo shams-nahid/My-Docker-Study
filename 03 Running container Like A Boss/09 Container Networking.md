@@ -2,17 +2,17 @@
 
 While we start a container with `-p` flag, it exposes a port from the host machine to the docker container. In background, a lot more is going on, we will discuss here.
 
-This `networking` staff is plugable and can be add or removed and we can change a lot of options under the hood.
+This `networking` staff is plugable. Under the hood, We can add a container to a container, remover form a network.
 
 When we start a container, we are particularly behind a docker network, called `bridge-network`. This `bridge-network` routes through `NAT Firewall` of the host IP. It is configured by the `docker-daemon` on our behalf. So the container can go back and forth of the outside internet and other network.
 
 But whenever we need to build a communication between specific containers we do not need any port mapping using `-p`.
 
-If we have a `node` application container and a `mongoDB` container, and they need to connect each other, we do not have to do the port mapping or open the port to the posts to the rest of the physical network.
+If we have a network with a `node` application container and a `mongoDB` container, and they need to connect each other, we do not have to do the port mapping or open the port to the rest of the physical network.
 
-And if we have another network with `php` server container and `mysql` database container, they can communicate each other but can not communicate with network of `node` and `mongoDB` servers network.
+And if we have another network with `php` server container and `mysql` database container, they can communicate each other but can not communicate with `node` and `mongoDB` servers network.
 
-With this setup, If the `php server` have to connect with the `node server`, it has to go through the host machine network.
+With this setup, if the `php server` have to connect with the `node server`, it has to go through the host machine network.
 
 All these configurations are configurable, can be add, removed or changed.
 
@@ -22,9 +22,9 @@ All these configurations are configurable, can be add, removed or changed.
 
 ### Networking CLI Hands On
 
-Here we will create two docker network with containers in it. Then play around of adding, removing containers from these networks.
+Here we will create two docker network with containers in it. Then play around of adding, removing containers of these networks.
 
-**Create Setup**
+**Networking Setup**
 
 We can get the list of networks by,
 

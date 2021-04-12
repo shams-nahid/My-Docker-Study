@@ -40,7 +40,7 @@ This will output the list of network.
 
 > `bridge` is the default docker network. `host` is the network, skip `docker-virtual-network` and attach to host network directly. Disadvantages is, this skip default container security but could be useful for high throughput networking. `null` is not attached to anything.
 
-To see the details of the default network, 
+To see the details of the default network,
 
 ```docker
 docker network inspect bridge
@@ -95,7 +95,7 @@ docker network inspect bridge
 Make sure,
 
 - `ix_nginx_1` container is inside the `ix_network` network, `docker network inspect ix_network`
-  - We can inspect it through the `ix_network` network inspection 
+  - We can inspect it through the `ix_network` network inspection
   - Or inspecting the container itself, `docker container inspect ix_nginx_1`
 - `ix_nginx_2` container is inside the default network
   - We can inspect it through the default network inspection, `docker network inspect bridge`
@@ -183,7 +183,7 @@ It is possible the latest `nginx` container does not have the `ping` program pre
 
 > OCI runtime exec failed: exec failed: container_linux.go:367: starting container process caused: exec: "ping": executable file not found in $PATH: unknown
 
-If you notice this error, first install the `ping` program in the `ix_dns_nginx` container. 
+If you notice this error, first install the `ping` program in the `ix_dns_nginx` container.
 
 Run `bash` in the `nginx` container,
 
@@ -220,7 +220,7 @@ We can ping another container in the same network without IP.
 
 The resolution works in both ways, we can ping `ix_dns_nginx` from the `ix_nginx_1` server also.
 
-This makes super easy when we need to talk from one container to another container. These containers IP address  may not be same but their container name or the host names will always be the same.
+This makes super easy when we need to talk from one container to another container. These containers IP address may not be same but their container name or the host names will always be the same.
 
 > The default docker `bridge` network has a disadvantages. It does not have built in `DNS` server. In this case we have to use the `--link` flag. It's comparatively easier to use the custom network for this purpose, instead of using the default `bridge` network.
 

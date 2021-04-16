@@ -37,3 +37,5 @@ docker container run -d --name nginx -p 80:80 -v "$(pwd)":/usr/share/nginx/html 
 Now if we browse `http://localhost/` from browser, we should see the the `nginx` server is serving our `index.html` instead of the container itself.
 
 > If you are in the windows machine, instead of `"$(pwd)"`, for PowerShell use `${pwd}` and for cmd.exe "Command Prompt use: `%cd%`
+
+If we change the content of the `index.html` and reload the browser with address `http://localhost/`, we should see the new content from the `index.html`.

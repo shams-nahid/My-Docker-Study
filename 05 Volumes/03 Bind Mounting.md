@@ -2,6 +2,8 @@
 
 ---
 
+With `Bind Mounting`, in local environment, we can edit files in the host machine and that is used inside the container.
+
 Bind mounting is mapping mapping host files and directories into container files and directories. It skips the union file system and on delete a container, do not erase the data from host machine.
 
 If we have files that is mapped to the host files and also exist in the container, in this case the host files will be used.

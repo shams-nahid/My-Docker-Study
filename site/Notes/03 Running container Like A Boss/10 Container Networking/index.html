@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Shams Nahid">
+        <link rel="canonical" href="http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/10 Container Networking/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>10 Container Networking - Docker Study Notes</title>
+        <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link href="../../../css/extra.css" rel="stylesheet">
+
+        <script src="../../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../..">Docker Study Notes</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../../..">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">01 Docker Essential</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../01 Docker Essential/01 Docker 101/">01 Docker 101</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/02 Docker Container/">02 Docker Container</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/03 Docker Lifecycle/">03 Docker Lifecycle</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/04 Docker Basic Commands/">04 Docker Basic Commands</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/05 Create Custom Image/">05 Create Custom Image</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/06 Wrap Web App in Docker/">06 Wrap Web App in Docker</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/07 Using Docker Compose/">07 Using Docker Compose</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">02 CI CD With Docker</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/01 Single Container CI-CD Workflow/">01 Single Container CI CD Workflow</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02  multi container</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/01 Multi-container development environment/">01 Multi container development environment</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/02 Multi-container Continuous Integration/">02 Multi container Continuous Integration</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/03 Multi-container Continuous Deployment/">03 Multi container Continuous Deployment</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">03 Running container Like A Boss</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../01 Intro/">Using Container Like A Boss</a>
+</li>
+            
+<li >
+    <a href="../02 Play With Nginx Server/">Play With Nginx Server</a>
+</li>
+            
+<li >
+    <a href="../03 With Container Run/">With Container Run</a>
+</li>
+            
+<li >
+    <a href="../04 Container vs VM/">Container vs VM</a>
+</li>
+            
+<li >
+    <a href="../05 Windows Containers/">Windows Containers</a>
+</li>
+            
+<li >
+    <a href="../06 Assignment of Multiple Containers/">06 Assignment of Multiple Containers</a>
+</li>
+            
+<li >
+    <a href="../07 CLI Process Monitoring/">07 CLI Process Monitoring</a>
+</li>
+            
+<li >
+    <a href="../08 Getting a Shell Inside a Container/">08 Getting a Shell Inside a Container</a>
+</li>
+            
+<li >
+    <a href="../09 IP Fact/">09 IP Fact</a>
+</li>
+            
+<li class="active">
+    <a href="./">10 Container Networking</a>
+</li>
+            
+<li >
+    <a href="../11 Assignments/">11 Assignments</a>
+</li>
+            
+<li >
+    <a href="../12 Assignment/">12 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">04 Images</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../04 Images/01 Caching/">01 Caching</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/02 Tagging/">02 Tagging</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/03 Building Image/">03 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/04 Assignment/">04 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">05 Volumes</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../05 Volumes/01 Data Persistent/">01 Data Persistent</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/02 Data Volumes/">02 Data Volumes</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/03 Bind Mounting/">03 Bind Mounting</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/04 Assignment: Named Volumes/">04 Assignment: Named Volumes</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">06 Docker Compose</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../06 Docker Compose/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/02 Example/">02 Example</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/03 Assignment 01/">03 Assignment 01</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/04 Building Image/">04 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/05 Assignment 02/">05 Assignment 02</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">07 swarm</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../07 swarm/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../07 swarm/02 Swarm Service/">02 Swarm Service</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">08 Docker on AWS</a>
+    <ul class="dropdown-menu">
+            
+  <li class="dropdown-submenu">
+    <a href="#">01 ECS Quick Start</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/">01 ECS vs Fargate</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/02 IAM User/">02 IAM User</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/">03 First Container Launch</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/">04 ECS Pricing</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02 ECS Cluster Setup</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/">02 IAM Roles For ECS</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/">03 Core Infrastructure for ECS</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../09 IP Fact/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../11 Assignments/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/bmshamsnahid/My-Docker-Study"><i class="fa fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#container-networking">Container Networking</a></li>
+            <li><a href="#networking-cli-hands-on">Networking CLI Hands On</a></li>
+            <li><a href="#dns">DNS</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="container-networking">Container Networking</h2>
+<p>While we start a container with <code>-p</code> flag, it exposes a port from the host machine to the docker container. In background, a lot more is going on, we will discuss here.</p>
+<p>This <code>networking</code> staff is plugable. Under the hood, We can add a container to a container, remover form a network.</p>
+<p>When we start a container, we are particularly behind a docker network, called <code>bridge-network</code>. This <code>bridge-network</code> routes through <code>NAT Firewall</code> of the host IP. It is configured by the <code>docker-daemon</code> on our behalf. So the container can go back and forth of the outside internet and other network.</p>
+<p>But whenever we need to build a communication between specific containers we do not need any port mapping using <code>-p</code>.</p>
+<p>If we have a network with a <code>node</code> application container and a <code>mongoDB</code> container, and they need to connect each other, we do not have to do the port mapping or open the port to the rest of the physical network.</p>
+<p>And if we have another network with <code>php</code> server container and <code>mysql</code> database container, they can communicate each other but can not communicate with <code>node</code> and <code>mongoDB</code> servers network.</p>
+<p>With this setup, if the <code>php server</code> have to connect with the <code>node server</code>, it has to go through the host machine network.</p>
+<p>All these configurations are configurable, can be add, removed or changed.</p>
+<blockquote>
+<p>We can not have two container listening at the same port at the host level</p>
+</blockquote>
+<p><strong>Figure</strong></p>
+<h3 id="networking-cli-hands-on">Networking CLI Hands On</h3>
+<p>Here we will create two docker network with containers in it. Then play around of adding, removing containers of these networks.</p>
+<p><strong>Objective</strong></p>
+<p>We will create two container, <code>ix_nginx_1</code> and <code>ix_nginx_2</code>. The <code>ix_nginx_1</code> should connect to a custom network <code>ix_network</code>. On the other hand, the <code>ix_nginx_2</code> should connect to the both networks, <code>ix_network</code> and the default docker network.</p>
+<p><strong>Networking Setup</strong></p>
+<p>We can get the list of networks by,</p>
+<pre><code class="docker">docker network ls
+</code></pre>
+
+<p>This will output the list of network.</p>
+<blockquote>
+<p><code>bridge</code> is the default docker network. <code>host</code> is the network, skip <code>docker-virtual-network</code> and attach to host network directly. Disadvantages is, this skip default container security but could be useful for high throughput networking. <code>null</code> is not attached to anything.</p>
+</blockquote>
+<p>To see the details of the default network,</p>
+<pre><code class="docker">docker network inspect bridge
+</code></pre>
+
+<p>In the output, under <code>containers</code>, a list of containers under the default <code>bridge</code> network will be displayed.</p>
+<p>To create our own docker network named <code>ix_network</code>,</p>
+<pre><code class="docker">docker network create ix_network
+</code></pre>
+
+<p>This will create the network and return the network id.</p>
+<p>We can verify this network existence by looking at the list of network by,</p>
+<pre><code class="docker">docker network ls
+</code></pre>
+
+<p>In output list, there should be a network named <code>ix_network</code>. It is using default driver bridge.</p>
+<p>Now, we will create a nginx container named <code>ix_nginx_1</code> that should go under our new custom network, <code>ix_network</code>,</p>
+<pre><code class="docker">docker container run -d --name ix_nginx_1 --network ix_network nginx
+</code></pre>
+
+<p>To check, if the new container is running under our new created network,</p>
+<pre><code class="docker">docker network inspect ix_network
+</code></pre>
+
+<p>In the <code>containers</code> property, the container named <code>ix_nginx_1</code> should appear.</p>
+<p>Now, create another container named <code>ix_nginx_2</code> under the default network,</p>
+<pre><code class="docker">docker container run -d --name ix_nginx_2 nginx
+</code></pre>
+
+<p>If we inspect the default network, in the containers property, the container, <code>ix_nginx_2</code> should appear.</p>
+<pre><code class="docker">docker network inspect bridge
+</code></pre>
+
+<p><strong>Verify Setup</strong></p>
+<p>Make sure,</p>
+<ul>
+<li><code>ix_nginx_1</code> container is inside the <code>ix_network</code> network, <code>docker network inspect ix_network</code></li>
+<li>We can inspect it through the <code>ix_network</code> network inspection</li>
+<li>Or inspecting the container itself, <code>docker container inspect ix_nginx_1</code></li>
+<li><code>ix_nginx_2</code> container is inside the default network</li>
+<li>We can inspect it through the default network inspection, <code>docker network inspect bridge</code></li>
+<li>Or inspecting the container itself, <code>docker container inspect ix_nginx_2</code></li>
+</ul>
+<p><strong>Experiments</strong></p>
+<p>We can add the <code>ix_nginx_2</code> to the <code>ix_network</code> network using the <code>connect</code> command.</p>
+<p>Now connect <code>ix_nginx_2</code> to the <code>ix_network</code> network</p>
+<pre><code class="docker">docker network connect ix_network ix_nginx_2
+</code></pre>
+
+<p>We can verify, <code>ix_nginx_2</code> is connected to two networks by,</p>
+<pre><code class="docker">docker container inspect ix_nginx_2
+</code></pre>
+
+<p>Under the <code>NetworkSettings.Networks</code> property, there should be the default <code>bridge</code> network and <code>ix_network</code>.</p>
+<p>We can disconnect <code>ix_nginx_2</code> from the <code>ix_network</code> by disconnect command,</p>
+<pre><code class="docker">docker network disconnect ix_network ix_nginx_2
+</code></pre>
+
+<p>The beauty of containerization is using networking, even though we run all the app in a same server, we can protect them separately.</p>
+<h3 id="dns">DNS</h3>
+<p>In the world of containers, there is constant change of containers like, launching, stopping, expanding, shrinking etc. Containers can go away, fail on runtime, can crash. In these cases, docker will bring them up with a new IP. Since things are so dynamic and complicated, We can not relay on IP addresses, or deal with IP addresses inside the container.</p>
+<p>For this, <code>docker</code> provide a built-in solution, <code>DNS-Naming</code>.</p>
+<p><strong>Objective</strong></p>
+<p><strong>Figure</strong></p>
+<p>We can get list of containers,</p>
+<pre><code class="docker">docker container ls
+</code></pre>
+
+<p>Make sure, the container, <code>ix_nginx_1</code> is running under the <code>ix_network</code>. If not run them by,</p>
+<pre><code class="docker">docker container start ix_nginx_1
+</code></pre>
+
+<p>And verify the <code>ix_network</code> contains the container <code>ix_nginx_1</code></p>
+<pre><code class="docker">docker network inspect ix_network
+</code></pre>
+
+<p>Let's create another container <code>ix_dns_nginx</code> inside the <code>ix_network</code>,</p>
+<pre><code class="docker">docker container run -d --name ix_dns_nginx --network ix_network nginx
+</code></pre>
+
+<p>Docker default <code>bridge</code> network does not support built in <code>DNS Resolution</code>.</p>
+<p>Since <code>ix_nginx_1</code> and <code>ix_dns_nginx</code> are not the under default <code>bridge</code> network, it has the built in special feature, <code>DNS Resolution</code>.</p>
+<p>Now, let's again check, the <code>ix_nginx_1</code> and <code>ix_dns_nginx</code> are in the same network <code>ix_network</code>,</p>
+<pre><code class="docker">docker network inspect ix_network
+</code></pre>
+
+<p>Under the <code>Containers</code> property, both containers should appear.</p>
+<p>Lets, try to ping <code>ix_nginx_1</code> from the <code>ix_dns_nginx</code> container, by</p>
+<pre><code class="docker">docker container exec -it ix_dns_nginx ping ix_nginx_1
+</code></pre>
+
+<p>It is possible the latest <code>nginx</code> container does not have the <code>ping</code> program pre-installed. In this case, it will throw an error like this,</p>
+<blockquote>
+<p>OCI runtime exec failed: exec failed: container_linux.go:367: starting container process caused: exec: "ping": executable file not found in $PATH: unknown</p>
+</blockquote>
+<p>If you notice this error, first install the <code>ping</code> program in the <code>ix_dns_nginx</code> container.</p>
+<p>Run <code>bash</code> in the <code>nginx</code> container,</p>
+<pre><code class="docker">docker container exec -it ix_dns_nginx bash
+</code></pre>
+
+<p>From the <code>bash</code>, update the package manager and install the <code>ping</code> command,</p>
+<pre><code class="bash">apt-get update
+apt-get install iputils-ping
+</code></pre>
+
+<p>Now we can ping the <code>ix_nginx_1</code> from the bash by,</p>
+<pre><code class="bash">ping ix_nginx_1
+</code></pre>
+
+<p>If you ping from the terminal first exit from the bash,</p>
+<pre><code class="bash">exit
+</code></pre>
+
+<p>Now from your own terminal run,</p>
+<pre><code class="docker">docker container exec -it ix_dns_nginx ping ix_nginx_1
+</code></pre>
+
+<p>We can ping another container in the same network without IP.</p>
+<p>The resolution works in both ways, we can ping <code>ix_dns_nginx</code> from the <code>ix_nginx_1</code> server also.</p>
+<p>This makes super easy when we need to talk from one container to another container. These containers IP address may not be same but their container name or the host names will always be the same.</p>
+<blockquote>
+<p>The default docker <code>bridge</code> network has a disadvantages. It does not have built in <code>DNS</code> server. In this case we have to use the <code>--link</code> flag. It's comparatively easier to use the custom network for this purpose, instead of using the default <code>bridge</code> network.</p>
+<p>Using <code>docker-compose</code>, we can automatically spin up a <code>virtual</code> network for us.</p>
+</blockquote></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021 <a href="https://shams-nahid.com/">Shams Nahid</a>.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js" defer></script>
+        <script src="../../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

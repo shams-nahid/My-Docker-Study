@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+     <loc>http://docker-study.shams-nahid.com/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/01 Docker Essential/01 Docker 101/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/01 Docker Essential/02 Docker Container/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/01 Docker Essential/03 Docker Lifecycle/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/01 Docker Essential/04 Docker Basic Commands/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/01 Docker Essential/05 Create Custom Image/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/01 Docker Essential/06 Wrap Web App in Docker/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/01 Docker Essential/07 Using Docker Compose/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/02 CI-CD With Docker/01 Single Container CI-CD Workflow/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/02 CI-CD With Docker/02  multi-container/01 Multi-container development environment/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/02 CI-CD With Docker/02  multi-container/02 Multi-container Continuous Integration/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/02 CI-CD With Docker/02  multi-container/03 Multi-container Continuous Deployment/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/01 Intro/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/02 Play With Nginx Server/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/03 With Container Run/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/04 Container vs VM/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/05 Windows Containers/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/06 Assignment of Multiple Containers/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/07 CLI Process Monitoring/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/08 Getting a Shell Inside a Container/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/09 IP Fact/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/10 Container Networking/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/11 Assignments/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/03 Running container Like A Boss/12 Assignment/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/04 Images/01 Caching/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/04 Images/02 Tagging/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/04 Images/03 Building Image/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/04 Images/04 Assignment/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/05 Volumes/01 Data Persistent/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/05 Volumes/02 Data Volumes/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/05 Volumes/03 Bind Mounting/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/05 Volumes/04 Assignment: Named Volumes/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/06 Docker Compose/01 Overview/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/06 Docker Compose/02 Example/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/06 Docker Compose/03 Assignment 01/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/06 Docker Compose/04 Building Image/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/06 Docker Compose/05 Assignment 02/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/07 swarm/01 Overview/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/07 swarm/02 Swarm Service/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/08 Docker on AWS/01 ECS Quick Start/02 IAM User/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/08 Docker on AWS/02 ECS Cluster Setup/01 Overview/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://docker-study.shams-nahid.com/Notes/08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/</loc>
+     <lastmod>2021-10-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+</urlset>

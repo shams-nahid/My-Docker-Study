@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Shams Nahid">
+        <link rel="canonical" href="http://docker-study.shams-nahid.com/Notes/01 Docker Essential/07 Using Docker Compose/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>07 Using Docker Compose - Docker Study Notes</title>
+        <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link href="../../../css/extra.css" rel="stylesheet">
+
+        <script src="../../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../..">Docker Study Notes</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../../..">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">01 Docker Essential</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../01 Docker 101/">01 Docker 101</a>
+</li>
+            
+<li >
+    <a href="../02 Docker Container/">02 Docker Container</a>
+</li>
+            
+<li >
+    <a href="../03 Docker Lifecycle/">03 Docker Lifecycle</a>
+</li>
+            
+<li >
+    <a href="../04 Docker Basic Commands/">04 Docker Basic Commands</a>
+</li>
+            
+<li >
+    <a href="../05 Create Custom Image/">05 Create Custom Image</a>
+</li>
+            
+<li >
+    <a href="../06 Wrap Web App in Docker/">06 Wrap Web App in Docker</a>
+</li>
+            
+<li class="active">
+    <a href="./">07 Using Docker Compose</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">02 CI CD With Docker</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/01 Single Container CI-CD Workflow/">01 Single Container CI CD Workflow</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02  multi container</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/01 Multi-container development environment/">01 Multi container development environment</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/02 Multi-container Continuous Integration/">02 Multi container Continuous Integration</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/03 Multi-container Continuous Deployment/">03 Multi container Continuous Deployment</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">03 Running container Like A Boss</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../03 Running container Like A Boss/01 Intro/">Using Container Like A Boss</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/02 Play With Nginx Server/">Play With Nginx Server</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/03 With Container Run/">With Container Run</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/04 Container vs VM/">Container vs VM</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/05 Windows Containers/">Windows Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/06 Assignment of Multiple Containers/">06 Assignment of Multiple Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/07 CLI Process Monitoring/">07 CLI Process Monitoring</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/08 Getting a Shell Inside a Container/">08 Getting a Shell Inside a Container</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/09 IP Fact/">09 IP Fact</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/10 Container Networking/">10 Container Networking</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/11 Assignments/">11 Assignments</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/12 Assignment/">12 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">04 Images</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../04 Images/01 Caching/">01 Caching</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/02 Tagging/">02 Tagging</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/03 Building Image/">03 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/04 Assignment/">04 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">05 Volumes</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../05 Volumes/01 Data Persistent/">01 Data Persistent</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/02 Data Volumes/">02 Data Volumes</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/03 Bind Mounting/">03 Bind Mounting</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/04 Assignment: Named Volumes/">04 Assignment: Named Volumes</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">06 Docker Compose</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../06 Docker Compose/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/02 Example/">02 Example</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/03 Assignment 01/">03 Assignment 01</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/04 Building Image/">04 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/05 Assignment 02/">05 Assignment 02</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">07 swarm</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../07 swarm/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../07 swarm/02 Swarm Service/">02 Swarm Service</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">08 Docker on AWS</a>
+    <ul class="dropdown-menu">
+            
+  <li class="dropdown-submenu">
+    <a href="#">01 ECS Quick Start</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/">01 ECS vs Fargate</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/02 IAM User/">02 IAM User</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/">03 First Container Launch</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/">04 ECS Pricing</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02 ECS Cluster Setup</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/">02 IAM Roles For ECS</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/">03 Core Infrastructure for ECS</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../06 Wrap Web App in Docker/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../../02 CI-CD With Docker/01 Single Container CI-CD Workflow/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/bmshamsnahid/My-Docker-Study"><i class="fa fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#using-docker-compose-managing-multiple-local-containers">Using Docker Compose: Managing Multiple Local Containers</a></li>
+            <li><a href="#docker-compose">Docker Compose</a></li>
+            <li><a href="#a-hands-on">A Hands On</a></li>
+            <li><a href="#creating-the-node-server">Creating The Node Server</a></li>
+            <li><a href="#assembling-dockerfile-to-node-server">Assembling Dockerfile to Node Server</a></li>
+            <li><a href="#redis-server">Redis Server</a></li>
+            <li><a href="#bring-the-docker-compose">Bring The Docker Compose</a></li>
+            <li><a href="#stop-containers-with-docker-compose">Stop Containers with Docker Compose</a></li>
+            <li><a href="#container-maintenance-with-docker-compose">Container Maintenance with Docker Compose</a></li>
+            <li><a href="#checking-container-status-with-docker-compose">Checking Container Status With Docker Compose</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="using-docker-compose-managing-multiple-local-containers">Using Docker Compose: Managing Multiple Local Containers</h2>
+<h3 id="docker-compose">Docker Compose</h3>
+<hr />
+<p><code>docker-compose</code> helps us to avoid repetitive commands, that we might have to write with <code>docker-cli</code> during a <code>container</code> start up.</p>
+<p>For example, if we have two <code>container</code> and need a networking between them, we have to configure these with <code>docker-cli</code> every time we start the <code>container</code>.</p>
+<p>Using <code>docker-compose</code> we can resolve the issue.</p>
+<blockquote>
+<p>This <code>docker-compose</code> allows us to start up multiple container at the same time in a very easy and straightforward way. Also it will set up some sort of networking between them and all behind the scene.</p>
+</blockquote>
+<p>To make use of <code>docker-compose</code>, we essentially going to the <code>docker-cli</code> startup commands of long form and encode these command in <code>docker-compose.yml</code> file. We do not entirely copy and paste the start-up commands, instead we use special syntax more or less similar to the start up commands.</p>
+<p>After creating the <code>docker-compose.yml</code> file, we will feed the file to the <code>docker-compose-cli</code> to parse the file and create container with our desired configurations.</p>
+<p>In <code>windows</code> and <code>mac</code> OS the <code>docker-compose</code> is shipped with the <code>docker</code> installation. But for linux machines, you might need to install the <code>docker-compose</code> library separately. To install the <code>docker-compose</code> in <code>Ubuntu 20.04</code>, that I am using, can follow the <a href="https://stackoverflow.com/questions/36685980/docker-is-installed-but-docker-compose-is-not-why">instructions</a></p>
+<pre><code class="bash">sudo curl -L &quot;https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)&quot;  -o /usr/local/bin/docker-compose
+
+sudo mv /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+sudo chmod +x /usr/bin/docker-compose
+</code></pre>
+
+<p>First instruction download the library, second one move it to <code>/usr/bin/docker-compose</code> and using the third instruction, we are giving the <code>docker-compose</code> appropriate permissions.</p>
+<h3 id="a-hands-on">A Hands On</h3>
+<hr />
+<p>Let's develop a classic docker example.</p>
+<p>Here we will create a little docker container that will host a web application. This web application will count the number of visit to that web app.</p>
+<p>We will need a node app that will response on the <code>HTTP</code> request and a <code>redis</code> server that will count the number of visit. Although <code>redis</code> is a in memory server, in this case we will consider itself as our tiny database.</p>
+<p>Off course we can use the node server to store the number of visits. To make the container a little bit complex we are using both a <code>node</code> server and a <code>redis</code> server.</p>
+<p>We can consider a single container with both <code>node server</code> and <code>redis server</code> in it. But this will create problem on scalability.</p>
+<p>For more traffic, if we increase the number of containers, for each container, there will be individual <code>node server</code> and <code>redis server</code>. Also each <code>redis server</code> will be isolated from each others. So one <code>redis server</code> will give us total visit of <code>10</code>, another <code>redis server</code> will give us total visit of <code>5</code>.</p>
+<p>So our actual approach will be both <code>node server</code> and <code>redis server</code> will be in isolated container. An in case of scaling we will scale the <code>node-app-container</code> and all the <code>node-app-container</code> will be connected to the single <code>redis-server-container</code>.</p>
+<h3 id="creating-the-node-server">Creating The Node Server</h3>
+<hr />
+<p>Create a project directory named <code>visits</code>,</p>
+<pre><code class="bash">mkdir visits
+</code></pre>
+
+<p>Now go to the directory and create a node project</p>
+<pre><code class="bash">cd visits
+yarn init -y
+</code></pre>
+
+<p>Create a file <code>index.js</code></p>
+<pre><code class="bash">touch index.js
+</code></pre>
+
+<p>The <code>index.js</code> will be responsible for creating the <code>node server</code> and connect with the <code>redis server</code> to display the <code>number of site visits</code> in the browser on response of a <code>HTTP</code> request.</p>
+<p>The code of the <code>index.js</code> will be like followings,</p>
+<pre><code class="js">// import required modules
+const express = require('express');
+const redis = require('redis');
+
+const app = express(); // create app instance
+const client = redis.createClient({
+  host: 'redis-server', // service name of the `redis-server` we are using, will be defined in the `services` section of `docker-compose.yml` file
+  port: 6379 // default port of the `redis-server`
+}); // connect the node server with redis server
+client.set('visits', 0); // initially set number of visits to 0
+
+app.get('/', (req, res) =&gt; {
+  client.get('visits', (err, visits) =&gt; {
+    res.send(`Number of visits: ${visits}`); // in browser, showing the client, number of visits
+    client.set('visits', parseInt(visits) + 1); // increase the number visits
+  });
+});
+
+const PORT = 8081; // determine node server port no
+
+// run the server
+app.listen(PORT, () =&gt; console.log(`App is listening on port: ${PORT}`));
+</code></pre>
+
+<p>Except the redis connection on line</p>
+<pre><code class="js">const client = redis.createClient();
+</code></pre>
+
+<p>Here we will have to put necessary networking config of the redis server.</p>
+<h3 id="assembling-dockerfile-to-node-server">Assembling <code>Dockerfile</code> to Node Server</h3>
+<hr />
+<p>Our <code>Dockerfile</code> will be very simple to just run the node server</p>
+<pre><code class="bash"># define base image
+FROM node:alpine
+
+# define working directory inside the container
+WORKDIR /app
+
+# Copy the package.json file to the project directory
+COPY package.json .
+# install all the dependencies
+RUN npm install
+
+# Copy all the source code from host machine to the container project directory
+COPY . .
+
+# define the start up command of the container to run the server
+CMD [&quot;node&quot;, &quot;index.js&quot;]
+</code></pre>
+
+<p>Now let's build the image,</p>
+<pre><code class="bash">docker build -t docker_user_id/repo_name:latest .
+</code></pre>
+
+<p>This will create the <code>image</code> of our <code>node-app</code> named <code>docker_user_id/repo_name</code>.</p>
+<p>Now if we try to run the <code>node-app</code> (Although it will throw error, because <code>redis</code> server is not running yet),</p>
+<pre><code class="bash">docker run docker_user_id/repo_name
+</code></pre>
+
+<p>Here, we will get an error message,</p>
+<pre><code class="bash">ode:events:356
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: connect ECONNREFUSED 127.0.0.1:6379
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1139:16)
+Emitted 'error' event on RedisClient instance at:
+    at RedisClient.on_error (/app/node_modules/redis/index.js:406:14)
+    at Socket.&lt;anonymous&gt; (/app/node_modules/redis/index.js:279:14)
+    at Socket.emit (node:events:379:20)
+    at emitErrorNT (node:internal/streams/destroy:188:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:153:3)
+    at processTicksAndRejections (node:internal/process/task_queues:81:21) {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379
+}
+</code></pre>
+
+<p>In summary, it says, the <code>node-app</code> can not connect to the <code>redis-server</code>, as expected. We will fix it now.</p>
+<h3 id="redis-server"><code>Redis</code> Server</h3>
+<p>We can use vanilla <code>redis</code> image from <code>docker-hub</code>. We will simply run the <code>redis-server</code> by</p>
+<pre><code class="bash">docker run redis
+</code></pre>
+
+<p>Even with running the <code>redis-server</code>, if we run the <code>node-app</code> again, we will get the same error as before.</p>
+<p>Since both <code>node-app</code> and <code>redis-server</code> is in isolated container and there is no networking communication between them, the <code>node-app</code> will not be able to communicate with the <code>redis-server</code>.</p>
+<h3 id="bring-the-docker-compose">Bring The <code>Docker Compose</code></h3>
+<hr />
+<p>With <code>docker-compose</code> first we do the following configurations:</p>
+<ul>
+<li>For <code>redis-server</code> make use of the <code>redis</code> image</li>
+<li>For <code>node-app</code> make use of the <code>Dockerfile</code></li>
+<li>Also for the <code>node-app</code> map port <code>8081</code> from local machine port <code>4001</code></li>
+</ul>
+<p>By defining multiple services in the <code>docker-compose</code>, docker will put all the services essentially the same network. And as a result the containers can access each other freely.</p>
+<blockquote>
+<p>There are different versions of <code>docker-compose</code>. Here we will use version <code>3</code> as our <code>docker-version</code>.</p>
+<p>In the <code>docker-compose</code> the <code>redis-server</code> and the <code>node-app</code> are considered as <code>services</code>.</p>
+<p>For a <code>service</code> in the <code>docker-compose</code>, we have to define how we get the image. It could be an image from the <code>docker-hub</code> or from the <code>Dockerfile</code> we wrote. For <code>redis-server</code> we will use <code>docker-hub</code> image and for the <code>node-app</code> we will use our made up <code>Dockerfile</code></p>
+<p>For a <code>service</code> we can do the port mapping between local machine and container.</p>
+<p>For a <code>service</code> we can use a restart policy, discussed in details in the <code>maintenance</code> section.</p>
+</blockquote>
+<p>To do so, in the project directory, first create the <code>docker-compose.yml</code> file</p>
+<pre><code class="bash">touch docker-compose.yml
+</code></pre>
+
+<p>Now our <code>docker-compose.yml</code> file be</p>
+<pre><code class="yml">version: '3'
+services:
+  redis-server:
+    image: 'redis'
+  node-app:
+    restart: always
+    build: .
+    ports:
+      - '4001:8081'
+</code></pre>
+
+<p>We used to run the container by <code>docker run my_image_name</code>, which is similar to <code>docker-compose up</code>.</p>
+<p>We used 2 commands, one for <code>build</code> the image and another for <code>run</code> the container. The <code>docker-compose up --build</code> is similar to the followings existing commands,</p>
+<pre><code class="bash">docker build .
+docker run my_image_name
+</code></pre>
+
+<p>So to build and run our two docker image we can use the followings,</p>
+<pre><code>docker-compose up --build
+</code></pre>
+
+<p>This will</p>
+<ul>
+<li>Run container for <code>redis-server</code></li>
+<li>Build image for <code>node-app</code></li>
+<li>Run container for <code>node-app</code></li>
+<li>Put both container in same network</li>
+<li>Start the <code>redis-server</code> container</li>
+<li>Start the <code>node-app</code> container</li>
+</ul>
+<p>In output we should see</p>
+<pre><code>App is listening on port: 8081
+</code></pre>
+
+<p>Since we map port <code>4001</code> from local machine to <code>8081</code> of the host machine, from browser, we can access the <code>node-app</code> by <code>http://localhost:4001/</code>. If we go the browser <code>http://localhost:4001/</code>, we should see</p>
+<pre><code>Number of Visits: visit_count
+</code></pre>
+
+<h3 id="stop-containers-with-docker-compose">Stop Containers with Docker Compose</h3>
+<p>With <code>docker-cli</code> we used to run a container background using</p>
+<pre><code class="bash">docker run -d image_id
+</code></pre>
+
+<p>To stop the instance, we used</p>
+<pre><code class="bash">docker stop image_id
+</code></pre>
+
+<p>With <code>docker-compose</code>, to run the containers in background, we can use the following command,</p>
+<pre><code class="bash">docker-compose up -d
+</code></pre>
+
+<p>Also to stop all the containers using the <code>docker-compose</code> we can use the followings,</p>
+<pre><code class="bash">docker-compose down
+</code></pre>
+
+<p>We can verify if the container being stopped or not by <code>docker ps</code>.</p>
+<h3 id="container-maintenance-with-docker-compose">Container Maintenance with Docker Compose</h3>
+<hr />
+<p>It is possible that, out <code>node-server</code> may crash or hang over time. In this case, we might want to restart the server.</p>
+<p>In <code>docker-compose</code> there are 4 different restart policy,</p>
+<ol>
+<li><strong>no</strong>: Never restart the container, no matter what happen. This is default restart policy.</li>
+<li><strong>always</strong>: If the container stops for any reason, the <code>docker-compose</code> will restart the server.</li>
+<li><strong>on-failure</strong>: Only restart the container, if it crashes with an <code>error-code</code>.</li>
+<li><strong>unless-stopped</strong>: Always restart the container on crash except developer forcibly stop it.</li>
+</ol>
+<p>We need to put this <code>restart-policy</code> under the <code>service</code> declaration.</p>
+<p>In <code>node.js</code> we can exit from the app with <code>process.exit(exit_code)</code>. As exit code, we have</p>
+<ul>
+<li><code>0</code>, means everything is okay and we want to exit from the node application</li>
+<li><code>non-zero</code>, any value other than <code>0</code> means, there's something wrong and the <code>error-code</code> specifies that issue.</li>
+</ul>
+<p>The <code>restart-policy</code> of <code>always</code> work on when it encounters the <code>0</code> as <code>error-code</code>.</p>
+<p>If we use <code>restart-policy</code> as <code>on-failure</code>, we have to use <code>error-code</code> other than zero.</p>
+<p>Finally, If we use <code>unless-stopped</code> as <code>restart-policy</code>, then the <code>container</code> will always restart, unless we (<code>develop</code>) stop in from the <code>terminal</code>.</p>
+<blockquote>
+<p>As <code>restart-policy</code>, if we use <code>no</code> then we have to put <code>no</code> inside a quote. Because in <code>yml</code> file, <code>no</code> is interpreted as <code>false</code>. For other <code>restart-policy</code> like, <code>always</code>, <code>on-failure</code> or <code>unless-stopped</code> we can use plain text without the <code>quote</code>.</p>
+<p>Between, <code>always</code> and <code>on-failure</code> use cases, we might 100% time want a public web server restarted on crash. In this case, we use <code>always</code>. If we do some worker process, that is meant to do some specific job and then exit, then thats a good case to use <code>on-failure</code> exit policy.</p>
+</blockquote>
+<h3 id="checking-container-status-with-docker-compose">Checking Container Status With <code>Docker Compose</code></h3>
+<hr />
+<p>Traditionally, we used to check the container status using the <code>docker-cli</code> by</p>
+<pre><code class="bash">docker ps
+</code></pre>
+
+<p><code>Docker Compose</code> has a similar command,</p>
+<pre><code class="bash">docker-compose ps
+</code></pre>
+
+<p>This command should be executed inside the project directory, where the <code>docker-compose.yml</code> file exist.</p>
+<p>So, only the <code>containers</code> defined inside the <code>docker-compose</code> status will be displayed.</p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021 <a href="https://shams-nahid.com/">Shams Nahid</a>.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js" defer></script>
+        <script src="../../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

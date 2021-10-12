@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Shams Nahid">
+        <link rel="canonical" href="http://docker-study.shams-nahid.com/Notes/01 Docker Essential/05 Create Custom Image/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>05 Create Custom Image - Docker Study Notes</title>
+        <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link href="../../../css/extra.css" rel="stylesheet">
+
+        <script src="../../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../..">Docker Study Notes</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../../..">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">01 Docker Essential</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../01 Docker 101/">01 Docker 101</a>
+</li>
+            
+<li >
+    <a href="../02 Docker Container/">02 Docker Container</a>
+</li>
+            
+<li >
+    <a href="../03 Docker Lifecycle/">03 Docker Lifecycle</a>
+</li>
+            
+<li >
+    <a href="../04 Docker Basic Commands/">04 Docker Basic Commands</a>
+</li>
+            
+<li class="active">
+    <a href="./">05 Create Custom Image</a>
+</li>
+            
+<li >
+    <a href="../06 Wrap Web App in Docker/">06 Wrap Web App in Docker</a>
+</li>
+            
+<li >
+    <a href="../07 Using Docker Compose/">07 Using Docker Compose</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">02 CI CD With Docker</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/01 Single Container CI-CD Workflow/">01 Single Container CI CD Workflow</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02  multi container</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/01 Multi-container development environment/">01 Multi container development environment</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/02 Multi-container Continuous Integration/">02 Multi container Continuous Integration</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/03 Multi-container Continuous Deployment/">03 Multi container Continuous Deployment</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">03 Running container Like A Boss</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../03 Running container Like A Boss/01 Intro/">Using Container Like A Boss</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/02 Play With Nginx Server/">Play With Nginx Server</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/03 With Container Run/">With Container Run</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/04 Container vs VM/">Container vs VM</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/05 Windows Containers/">Windows Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/06 Assignment of Multiple Containers/">06 Assignment of Multiple Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/07 CLI Process Monitoring/">07 CLI Process Monitoring</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/08 Getting a Shell Inside a Container/">08 Getting a Shell Inside a Container</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/09 IP Fact/">09 IP Fact</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/10 Container Networking/">10 Container Networking</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/11 Assignments/">11 Assignments</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/12 Assignment/">12 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">04 Images</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../04 Images/01 Caching/">01 Caching</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/02 Tagging/">02 Tagging</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/03 Building Image/">03 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/04 Assignment/">04 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">05 Volumes</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../05 Volumes/01 Data Persistent/">01 Data Persistent</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/02 Data Volumes/">02 Data Volumes</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/03 Bind Mounting/">03 Bind Mounting</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/04 Assignment: Named Volumes/">04 Assignment: Named Volumes</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">06 Docker Compose</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../06 Docker Compose/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/02 Example/">02 Example</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/03 Assignment 01/">03 Assignment 01</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/04 Building Image/">04 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/05 Assignment 02/">05 Assignment 02</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">07 swarm</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../07 swarm/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../07 swarm/02 Swarm Service/">02 Swarm Service</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">08 Docker on AWS</a>
+    <ul class="dropdown-menu">
+            
+  <li class="dropdown-submenu">
+    <a href="#">01 ECS Quick Start</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/">01 ECS vs Fargate</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/02 IAM User/">02 IAM User</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/">03 First Container Launch</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/">04 ECS Pricing</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02 ECS Cluster Setup</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/">02 IAM Roles For ECS</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/">03 Core Infrastructure for ECS</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../04 Docker Basic Commands/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../06 Wrap Web App in Docker/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/bmshamsnahid/My-Docker-Study"><i class="fa fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#create-custom-image">Create Custom Image</a></li>
+            <li><a href="#hands-on">Hands On</a></li>
+            <li><a href="#dockerfile-teardown">Dockerfile Teardown</a></li>
+            <li><a href="#image-build-process">Image build process</a></li>
+            <li><a href="#rebuild-image-from-cache">Rebuild image from cache</a></li>
+            <li><a href="#tagging-a-docker-image">Tagging a docker image</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="create-custom-image">Create Custom Image</h2>
+<p>Throughout the previous notes, we been using <code>images</code> created by other engineers. To create our own image, we can do the followings,</p>
+<ul>
+<li>Create a <code>dockerfile</code>.</li>
+<li>Once a <code>dockerfile</code> is created, we will pass it to the <code>docker client</code></li>
+<li>This <code>docker client</code> will provide the <code>image</code> to the <code>docker server</code></li>
+<li>The <code>docker-server</code> will make the <code>image</code>, that we can use</li>
+</ul>
+<blockquote>
+<p>A <code>dockerfile</code> is a plain text file. It contains all the configs along with the startup commands to define how a docker <code>container</code> should behave. It determine what programs should be inside the container and how will these program behave during <code>container</code> star up.</p>
+<p><code>Docker server</code> does most of heavy lifting while creating a <code>image</code>. It takes the docker file, go through the configuration and build the useable <code>image</code></p>
+</blockquote>
+<p>For each <code>docker file</code>, there's always a patter</p>
+<ul>
+<li>A <code>base image</code></li>
+<li>Some config to install additional programs, dependencies that is required to create and execute the container</li>
+<li>A start up command, that will be executed on the moment a container start</li>
+</ul>
+<h3 id="hands-on">Hands On</h3>
+<hr />
+<p>Let's create our own docker <code>image</code> that will run a <code>redis-server</code>.
+We will follow the following procedures</p>
+<ol>
+<li>Define base <code>image</code></li>
+<li>Download and install the <code>dependencies</code></li>
+<li>Instruct the images initial behaviour</li>
+</ol>
+<p>So,</p>
+<ul>
+<li>First create a file named <code>Dockerfile</code></li>
+</ul>
+<p><code>bash
+  touch Dockerfile</code></p>
+<ul>
+<li>In the <code>Dockerfile</code>, add a base image</li>
+</ul>
+<p><code>bash
+  FROM alpine</code></p>
+<ul>
+<li>Download the dependency</li>
+</ul>
+<p><code>bash
+  RUN apk add --update redis</code></p>
+<ul>
+<li>Define the initial command</li>
+</ul>
+<p><code>bash
+  CMD ["redis-server"]</code></p>
+<p>Finally our <code>Dockerfile</code> should be the following</p>
+<pre><code class="bash">FROM alpine
+RUN apk add --update redis
+CMD [&quot;redis-server&quot;]
+</code></pre>
+
+<p>Now let's build the container</p>
+<pre><code class="bash">docker build .
+</code></pre>
+
+<p>This will create the image and return the <code>image_id</code>.</p>
+<p>Now we can run the <code>container</code> from the <code>image_id</code> using the followings,</p>
+<pre><code class="bash">docker run image_id
+</code></pre>
+
+<p>This will run the redis server.</p>
+<blockquote>
+<p><code>Dockerfile</code> is a plain file with no extension</p>
+</blockquote>
+<h3 id="dockerfile-teardown">Dockerfile Teardown</h3>
+<hr />
+<p>We just going through the process of creating a docker image. But we don't explain what really happen there. Now lets explain what actually we are done inside the <code>Dockerfile</code> configuration.</p>
+<p>We ran 3 commands to build the image, and all three has a very similar pattern. Each command like <code>FROM</code>, <code>RUN</code>, <code>CMD</code> are the docker <code>instruction</code> and they took some <code>arguments</code>.</p>
+<blockquote>
+<p>The <code>FROM</code> instruction specify a <code>docker image</code> we want to use as base. While we are preparing our custom image, the <code>RUN</code> execute some commands. The <code>CMD</code> specify, what should run on startup when our image will be used to create a new <code>container</code>.</p>
+</blockquote>
+<p>Every line of configuration we are going to add inside the <code>Dockerfile</code> will always start with a <code>instruction</code></p>
+<blockquote>
+<p>A base image is an initial set of programs that can be used to to further customize the the image. <code>Alpine</code> is a base image that comes with a package manager named <code>apk</code> (Apache Package Manager). <code>apk</code> can be used to download the <code>redis-server</code> and install in the system.</p>
+</blockquote>
+<p>With <code>FROM alpine</code> we are using an initial operating system named <code>alpine</code>. This <code>alpine</code> operating system has couple of preinstalled program, that are very much useful for what we are trying to accomplish. Since we are here to create <code>redis server</code> and we need to install some dependencies, <code>alpine</code> has these tools and programs preinstalled like <code>apk</code>.</p>
+<p>With <code>RUN apk add --update redis</code> we download and install the <code>redis</code> server. Here <code>apk</code> is nothing related to the <code>docker</code>. It's a dependency manager preinstalled in the <code>base image</code>, download and install the <code>redis</code> server.</p>
+<p>The <code>CMD ["redis-server"]</code> ensure, when we create a container from this docker <code>image</code>, the redis server will be started using <code>redis-server</code>command.</p>
+<h3 id="image-build-process">Image build process</h3>
+<hr />
+<p>To build a image from the <code>Dockerfile</code>, we use</p>
+<pre><code class="bash">docker build .
+</code></pre>
+
+<p>This ship our <code>Dockerfile</code> to the <code>docker client</code>. <code>build</code> is responsible for take the <code>Dockerfile</code> and build an <code>image</code> out of it.</p>
+<p>The <code>.</code> is the build context. The build context contains all the set of files and folders that belongs to our project needs to wrap or encapsulate in our docker <code>container</code>.</p>
+<p>If we notice the logs of the <code>docker build .</code>, we can see except the first instruction <code>FROM alpine</code>, every other instruction has an <code>intermediary container</code> that being removed automatically.</p>
+<p>This means, except first step, each step took the container from the previous step and step itself acts as the startup instruction. Then when step is done, it simply pass the updated file system snapshot and remove the temporary container from itself.</p>
+<p>For the last step, it took the container from the previous step, and do not run itself as the start-up command. Instead it only set itself as the first instruction and ensure if someone in future create and run the <code>container</code> out of the image, it then execute this last step as the <code>startup instruction</code>.</p>
+<blockquote>
+<p>For each step, except first one, we take the <code>image</code> from the previous step, create a temporary container, execute instructions, make changes, took the snapshot of the file system and return the file system output as output, so it can be used as the image for the next step. For last step, the final instruction is considered as the <code>start-up</code> instruction of the <code>docker container</code>.</p>
+</blockquote>
+<h3 id="rebuild-image-from-cache">Rebuild image from cache</h3>
+<hr />
+<p>Let's update the <code>Dockerfile</code> with an additional command</p>
+<pre><code class="bash">RUN apk add --update gcc
+</code></pre>
+
+<p>Now the <code>Dockerfile</code> should be like</p>
+<pre><code class="bash">FROM alpine
+RUN apk add --update redis
+RUN apk add --update gcc
+CMD [&quot;redis-server&quot;]
+</code></pre>
+
+<p>Let's build a image out of this <code>Dockerfile</code>,</p>
+<pre><code class="bash">docker build .
+</code></pre>
+
+<p>If we observer the <code>logs</code> closely, we see, in the second step, it does not create a <code>intermediary container</code> from the previous step. Instead it is using the cache. So we do not need to install the <code>redis-server</code> multiple times. This gives the docker robustness and faster build performance.</p>
+<p>From the instruction <code>RUN apk add --update gcc</code> it will create the <code>intermediary container</code> and since the file snapshot is being changed, it will do the same from the next steps.</p>
+<p>If we build the image from the same <code>Dockerfile</code> for the 3rd time, it will take all the changes from the cache instead of the <code>intermediary container</code>.</p>
+<blockquote>
+<p>An <code>intermediary container</code> is created from the previous step image and use to run current instruction, make changes, take the snapshot of the new changed file system and got removed. This snapshot is being used for the next step to create another <code>intermediary container</code> and goes on.</p>
+<p>Altering the instruction sequence will not use the cache.</p>
+</blockquote>
+<h3 id="tagging-a-docker-image">Tagging a docker image</h3>
+<hr />
+<p>Till now, we have created <code>image</code> from the <code>Dockerfile</code> and getting an <code>image_id</code>.</p>
+<p>When we want a name instead of an <code>image_id</code> we can use the <code>tagging</code>.</p>
+<p>To get a name, after a <code>image</code> being created, we can use the following</p>
+<pre><code class="bash">docker build -t user_name/image_name:version_number .
+</code></pre>
+
+<p>This will return</p>
+<pre><code class="bash">Successfully tagged user_name/image_name:version_number
+</code></pre>
+
+<blockquote>
+<p>Here the <code>user_name</code> is the <code>username</code>, that is used to login to the <code>docker-hub</code>. <code>image_name</code> is our desired image name. The <code>version_number</code> is the <code>image</code> version number. Instead of <code>version_number</code> we can use <code>lated</code> keyword to use the latest version number handled by the docker itself.</p>
+</blockquote>
+<p>We can now run the docker with the tag</p>
+<pre><code class="bash">docker run user_name/image_name:version_number
+</code></pre>
+
+<p>Here only the <code>version_number</code> is the tag itself. The <code>user_name</code> itself is always the <code>docker id</code> and <code>image_name</code> is the project name or the <code>repo name</code>.</p>
+<blockquote>
+<p>While running our tagged custom <code>image</code> we can ignore the <code>version_number</code>. It will simply take the latest version.</p>
+</blockquote></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021 <a href="https://shams-nahid.com/">Shams Nahid</a>.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js" defer></script>
+        <script src="../../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

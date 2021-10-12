@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Shams Nahid">
+        <link rel="canonical" href="http://docker-study.shams-nahid.com/Notes/02 CI-CD With Docker/02  multi-container/03 Multi-container Continuous Deployment/">
+        <link rel="shortcut icon" href="../../../../img/favicon.ico">
+        <title>03 Multi container Continuous Deployment - Docker Study Notes</title>
+        <link href="../../../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link href="../../../../css/extra.css" rel="stylesheet">
+
+        <script src="../../../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../../..">Docker Study Notes</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../../../..">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">01 Docker Essential</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../01 Docker Essential/01 Docker 101/">01 Docker 101</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/02 Docker Container/">02 Docker Container</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/03 Docker Lifecycle/">03 Docker Lifecycle</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/04 Docker Basic Commands/">04 Docker Basic Commands</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/05 Create Custom Image/">05 Create Custom Image</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/06 Wrap Web App in Docker/">06 Wrap Web App in Docker</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/07 Using Docker Compose/">07 Using Docker Compose</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">02 CI CD With Docker</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../01 Single Container CI-CD Workflow/">01 Single Container CI CD Workflow</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02  multi container</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../01 Multi-container development environment/">01 Multi container development environment</a>
+</li>
+            
+<li >
+    <a href="../02 Multi-container Continuous Integration/">02 Multi container Continuous Integration</a>
+</li>
+            
+<li class="active">
+    <a href="./">03 Multi container Continuous Deployment</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">03 Running container Like A Boss</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/01 Intro/">Using Container Like A Boss</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/02 Play With Nginx Server/">Play With Nginx Server</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/03 With Container Run/">With Container Run</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/04 Container vs VM/">Container vs VM</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/05 Windows Containers/">Windows Containers</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/06 Assignment of Multiple Containers/">06 Assignment of Multiple Containers</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/07 CLI Process Monitoring/">07 CLI Process Monitoring</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/08 Getting a Shell Inside a Container/">08 Getting a Shell Inside a Container</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/09 IP Fact/">09 IP Fact</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/10 Container Networking/">10 Container Networking</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/11 Assignments/">11 Assignments</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/12 Assignment/">12 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">04 Images</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../04 Images/01 Caching/">01 Caching</a>
+</li>
+            
+<li >
+    <a href="../../../04 Images/02 Tagging/">02 Tagging</a>
+</li>
+            
+<li >
+    <a href="../../../04 Images/03 Building Image/">03 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../../04 Images/04 Assignment/">04 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">05 Volumes</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../05 Volumes/01 Data Persistent/">01 Data Persistent</a>
+</li>
+            
+<li >
+    <a href="../../../05 Volumes/02 Data Volumes/">02 Data Volumes</a>
+</li>
+            
+<li >
+    <a href="../../../05 Volumes/03 Bind Mounting/">03 Bind Mounting</a>
+</li>
+            
+<li >
+    <a href="../../../05 Volumes/04 Assignment: Named Volumes/">04 Assignment: Named Volumes</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">06 Docker Compose</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../06 Docker Compose/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../../06 Docker Compose/02 Example/">02 Example</a>
+</li>
+            
+<li >
+    <a href="../../../06 Docker Compose/03 Assignment 01/">03 Assignment 01</a>
+</li>
+            
+<li >
+    <a href="../../../06 Docker Compose/04 Building Image/">04 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../../06 Docker Compose/05 Assignment 02/">05 Assignment 02</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">07 swarm</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../07 swarm/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../../07 swarm/02 Swarm Service/">02 Swarm Service</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">08 Docker on AWS</a>
+    <ul class="dropdown-menu">
+            
+  <li class="dropdown-submenu">
+    <a href="#">01 ECS Quick Start</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/">01 ECS vs Fargate</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/01 ECS Quick Start/02 IAM User/">02 IAM User</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/">03 First Container Launch</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/">04 ECS Pricing</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02 ECS Cluster Setup</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../08 Docker on AWS/02 ECS Cluster Setup/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/">02 IAM Roles For ECS</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/">03 Core Infrastructure for ECS</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../02 Multi-container Continuous Integration/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../../../03 Running container Like A Boss/01 Intro/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/bmshamsnahid/My-Docker-Study"><i class="fa fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#multi-container-continuous-deployment">Multi-container Continuous Deployment</a></li>
+        <li class="main "><a href="#container-definition">Container Definition</a></li>
+            <li><a href="#using-managed-db-service-in-production">Using Managed DB Service in Production</a></li>
+            <li><a href="#set-up-managed-services">Set Up Managed Services</a></li>
+            <li><a href="#update-travis-ci-config-file-for-production-deployment">Update Travis CI Config File For Production Deployment</a></li>
+            <li><a href="#cleaning-up-aws-resources">Cleaning Up AWS Resources</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="multi-container-continuous-deployment">Multi-container Continuous Deployment</h2>
+<p>Our <code>Travis CI</code> si already configured to build the image and push the image to the <code>Docker Hub</code>. Now we have to think about how use these images and deploy them to production. To deploy these image we are going to make use of <code>Elastic Beanstalk</code>.</p>
+<p>When we have only one container, the <code>Elastic Beanstalk</code> will automatically build and run the the container, we do not have to set up any custom configuration. In the root directory, we just have to take the project files and a <code>Dockerfile</code> and <code>Elastic Beanstalk</code> do the rest.</p>
+<p>Now, the scenario is different. we have multiple <code>Dockerfile</code> in different folder. Anytime we have multiple <code>Dockerfile</code>, we have to tell the <code>Elastic Beanstalk</code> with little configuration, how these <code>Dockerfile</code> will be treated.</p>
+<p>To put the configuration for <code>Elastic Beanstalk</code>, how our multiple <code>Dockerfile</code> will be treated, we have to create special config file in the project directory named <code>Dockerrun.aws.json</code>. This config file will define,</p>
+<ul>
+<li>From where the <code>image</code> files will be pulled</li>
+<li>Resources allocated for the <code>image</code></li>
+<li>Port mapping</li>
+<li>Some associated configurations like handling environment variables</li>
+</ul>
+<p>The configurations of <code>Dockerrun.aws.json</code> will be very much similar to the <code>docker-compose.yml</code> configuration.</p>
+<blockquote>
+<p><code>docker-compose.yml</code> is all about, how we build images, whereas <code>Dockerrun.aws.json</code> is all about definitions of container.</p>
+<p>When it comes to handle multiple container, the <code>Elastic Beanstalk</code> does not know, how to handle multiple containers. For multiple container, it delegates the tasks to another <code>AWS</code> server named <code>Elastic Container Service</code> aka <code>ECS</code>. In the <code>ECS</code> for each container, we will define <code>Task</code>, also known as <code>Task Definition</code>. A doc for defining the container configuration is given <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-task-definition.html#task-definition-template">here</a>.</p>
+</blockquote>
+<h2 id="container-definition">Container Definition</h2>
+<hr />
+<p>Go to the project root directory and create a file named <code>Dockerrun.aws.json</code>,</p>
+<pre><code class="bash">touch Dockerrun.aws.json
+</code></pre>
+
+<p>For the <code>Dockerrun.aws.json</code> file, we have to consider the following conventions,</p>
+<ul>
+<li><strong>version :</strong> We have to specify the template version. Different version compile differently</li>
+<li>List of containers Definitions</li>
+<li>For each container</li>
+<li><strong>name :</strong> Name should be the directory name</li>
+<li><strong>image :</strong> Image name that is deployed to the docker hub with the docker hub user name</li>
+<li><strong>hostname :</strong> Hostname should be the service name. This is also being used in the nginx configuration</li>
+<li><strong>essential :</strong> If this is true, crashing this container will make crash other containers. Among all the container, one should marked as <code>essential</code></li>
+<li><strong>memory :</strong> Need to define the allocated memory in mega bytes, required for a container</li>
+<li><strong>links :</strong> To do the routing we have to use the directory name</li>
+</ul>
+<blockquote>
+<p>For the worker and nginx, since no one is routing to these, we do not need any <code>hostname</code> in these configuration.</p>
+<p>Since, the <code>nginx</code> server is responsible for communicating with the outside world, we need to do the port mapping.</p>
+<p>Also, in the <code>nginx</code> server configuration we have to specify the routes to other containers</p>
+<p>It's challenging to allocate exactly essential memory for each of the services. Traditionally there are couple of stackoverflow posts, can be used to find out the desired memory allocation.</p>
+</blockquote>
+<p>Our <code>Dockerrun.aws.json</code> should be like the following,</p>
+<pre><code class="json">{
+  &quot;AWSEBDockerrunVersion&quot;: 2,
+  &quot;containerDefinitions&quot;: [
+    {
+      &quot;name&quot;: &quot;client&quot;,
+      &quot;image&quot;: &quot;bmshamsnahid/multi-client&quot;,
+      &quot;hostname&quot;: &quot;client&quot;,
+      &quot;essential&quot;: false,
+      &quot;memory&quot;: 128
+    },
+    {
+      &quot;name&quot;: &quot;server&quot;,
+      &quot;image&quot;: &quot;bmshamsnahid/multi-server&quot;,
+      &quot;hostname&quot;: &quot;api&quot;,
+      &quot;essential&quot;: false,
+      &quot;memory&quot;: 128
+    },
+    {
+      &quot;name&quot;: &quot;worker&quot;,
+      &quot;image&quot;: &quot;bmshamsnahid/multi-worker&quot;,
+      &quot;hostname&quot;: &quot;worker&quot;,
+      &quot;essential&quot;: false,
+      &quot;memory&quot;: 128
+    },
+    {
+      &quot;name&quot;: &quot;nginx&quot;,
+      &quot;image&quot;: &quot;bmshamsnahid/multi-nginx&quot;,
+      &quot;hostname&quot;: &quot;nginx&quot;,
+      &quot;essential&quot;: true,
+      &quot;portMappings&quot;: [
+        {
+          &quot;hostPort&quot;: 80,
+          &quot;containerPort&quot;: 80
+        }
+      ],
+      &quot;links&quot;: [&quot;client&quot;, &quot;server&quot;],
+      &quot;memory&quot;: 128
+    }
+  ]
+}
+</code></pre>
+
+<h3 id="using-managed-db-service-in-production">Using Managed DB Service in Production</h3>
+<hr />
+<p>In development, we are using the <code>redis</code> and <code>postgres</code> in our own development machine. But for production, we might need to consider a managed version of <code>redis</code> aka <code>AWS Elastic Cache</code> and for <code>postgres</code> we will make use of <code>AWS Relational Database Service</code>.</p>
+<p>Advantages of <code>AWS Elastic Cache</code> and <code>AWS Relational Database Service</code>,</p>
+<ul>
+<li>Managed creation and maintenance</li>
+<li>Easy scaling policy</li>
+<li>Built in logging</li>
+<li>Better security</li>
+<li>Easy migration</li>
+<li>Multi AZ configuration</li>
+</ul>
+<p>Additionally <code>AWS Relational Database Service</code> has some advantages,</p>
+<ul>
+<li>Database backup and rollback facility</li>
+<li>Easy tuning on Multi AZ and Read Replicas</li>
+</ul>
+<h3 id="set-up-managed-services">Set Up Managed Services</h3>
+<hr />
+<p>Let's build our cloud infrastructure to the using manged <code>AWS Services</code>. Along with the <code>AWS Elastic Beanstalk</code> we will make use of</p>
+<ul>
+<li>AWS RDS Instance</li>
+<li>AWS Elastic Cache</li>
+</ul>
+<p><strong>Set Up Associated Security Group :</strong></p>
+<p>Go to <code>VPC</code> section and from security group create one named <code>multi-docker</code>. The inbound rules should allow port range of <code>5432-6379</code> and source should be the newly created security group <code>multi-docker</code>.</p>
+<p><strong>Set Up Elastic Beanstalk :</strong></p>
+<p>Go to <code>Elastic Beanstalk</code> service and create application with the following config</p>
+<ul>
+<li>Name as <code>multi-docker</code></li>
+<li>Platform as <code>Docker</code></li>
+<li>Platform Branch as <code>Multi Container Docker running on 64bit Amazon Linux</code></li>
+<li>After creating the environment, go to configuration and edit instances security by adding the security group <code>multi-docker</code></li>
+</ul>
+<p><strong>Set Up RDS Postgres Instance :</strong></p>
+<p>Go to <code>AWS RDS</code> service and create database of <code>Postgres</code> instance with following configuration,</p>
+<ul>
+<li>Identifier as <code>multi-docker-postgres</code></li>
+<li>Username as <code>postgres</code></li>
+<li>Master Password as <code>postgrespassword</code></li>
+<li>Initial database name from the <code>Additional Settings</code> should be <code>fibvalues</code></li>
+<li>After creation of DB instance, modify the network security by adding security group <code>multi-docker</code></li>
+</ul>
+<p><strong>Set Up Elastic Cache Redis Instance :</strong></p>
+<p>Go to <code>Elastic Cache</code> service and create a <code>redis</code> instance with following configuration,</p>
+<ul>
+<li>Name should be <code>multi-docker-redis</code></li>
+<li>Node type as <code>cache.t2.micro</code> and replicas 0 per shard for less pricing</li>
+<li>After creating the instance, from action add the security group <code>multi-docker</code></li>
+</ul>
+<p><strong>Generate a IAM User With Appropriate Roles :</strong></p>
+<p>For simplicity of the <code>IAM</code> user existing policies, search <code>elasticbeanstalk</code> and mark all the services. This will provide an <code>AWS Access Key</code> and <code>AWS Secret Key</code>. This key and secret has to be provided to the <code>Travis cI</code> for invoking the <code>Elastic Beanstalk</code>.</p>
+<h3 id="update-travis-ci-config-file-for-production-deployment">Update Travis CI Config File For Production Deployment</h3>
+<hr />
+<p>We have left two config for the production deployment.</p>
+<ul>
+<li>Notify the <code>Elastic Beanstalk</code>, a new changes being happen in the codebase</li>
+<li>Push the entire project to <code>Elastic Beanstalk</code></li>
+</ul>
+<p>Although we are pushing the whole codebase to <code>Elastic Beanstalk</code>, the only file <code>ELB</code> care about is, <code>Dockerrun.aws.json</code>.</p>
+<p>From <code>Dockerrun.aws.json</code>, <code>ELB</code> download all the images from the docker hub and will run the container.</p>
+<p>Oue final <code>.travis.yml</code> with deploy configuration should be look like the following,</p>
+<pre><code class="yml">sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t bmshamsnahid/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true bmshamsnahid/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t bmshamsnahid/multi-client ./client
+  - docker build -t bmshamsnahid/multi-nginx ./nginx
+  - docker build -t bmshamsnahid/multi-server ./server
+  - docker build -t bmshamsnahid/multi-worker ./worker
+  - echo &quot;$DOCKER_PASSWORD&quot; | docker login -u &quot;$DOCKER_ID&quot; --password-stdin
+  - docker push bmshamsnahid/multi-client
+  - docker push bmshamsnahid/multi-nginx
+  - docker push bmshamsnahid/multi-server
+  - docker push bmshamsnahid/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: &quot;ap-south-1&quot;
+  app: &quot;multi-docker&quot;
+  env: &quot;MultiDocker-env&quot;
+  bucket_name: &quot;elasticbeanstalk-ap-south-1-366735605679&quot;
+  bucket_path: &quot;docker-multi&quot;
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+</code></pre>
+
+<p>In the <code>Travis CI</code> dashboard, select the environment and from options of the <code>multi-container-ci-cd</code> repository, add the following environment variables,</p>
+<ol>
+<li>AWS_ACCESS_KEY</li>
+<li>AWS_SECRET_KEY</li>
+</ol>
+<p>Now we make a commit and push the changed code to the master branch, <code>Travis CI</code> should automatically ensure the continuous integration and <code>Elastic Beanstalk</code> should ensure continuous deployment. After successful deployment, the <code>Elastic Beanstalk</code> environment should be show <code>Green</code> success check.</p>
+<p>Our application should be automatically deployed to the <code>Elastic Beanstalk</code>.</p>
+<h3 id="cleaning-up-aws-resources">Cleaning Up AWS Resources</h3>
+<hr />
+<p>Along the way, we have been using the following services,</p>
+<ul>
+<li>Elastic Beanstalk</li>
+<li>RDS Service</li>
+<li>Elastic Cache (Managed Redis)</li>
+<li>Security Group</li>
+<li>IAM User with necessary permissions</li>
+</ul>
+<p><strong>Deleting Elastic Beanstalk :</strong></p>
+<ul>
+<li>Go to the Elastic <code>Beanstalk Service</code> and select the <code>multi-docker</code> environment</li>
+<li>From action select the <code>Terminate Application</code></li>
+</ul>
+<p><strong>Deleting RDS Service :</strong></p>
+<ul>
+<li>Go to <code>RDS</code> service</li>
+<li>Select the <code>multi-docker-postgres</code> and from action select <code>Delete</code></li>
+</ul>
+<p><strong>Deleting Elastic Cache :</strong></p>
+<ul>
+<li>Go to <code>Elastic Cache</code></li>
+<li>From <code>redis</code> select our instance <code>multi-docker-redis</code></li>
+<li>Select and from action, click the <code>Delete</code> option</li>
+</ul>
+<p><strong>Deleting Security Group (Optional) :</strong></p>
+<ul>
+<li>Go to <code>VPC</code> service and from left panel select <code>Security Groups</code></li>
+<li>Delete the security group named <code>multi-docker</code> and all its associates if there any</li>
+</ul>
+<p><strong>Deleting IAM Users (Optional) :</strong></p>
+<ul>
+<li>Go to <code>IAM</code> service and delete the user we have created</li>
+</ul>
+<blockquote>
+<p>For security groups, we might not need to delete them, as they are not billing service. Same goes for <code>IAM</code> user, it is not included in a billing service, but good to delete if not necessary.</p>
+</blockquote></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021 <a href="https://shams-nahid.com/">Shams Nahid</a>.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../../js/base.js" defer></script>
+        <script src="../../../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

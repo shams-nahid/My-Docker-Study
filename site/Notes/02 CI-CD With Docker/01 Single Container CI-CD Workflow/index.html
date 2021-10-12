@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Shams Nahid">
+        <link rel="canonical" href="http://docker-study.shams-nahid.com/Notes/02 CI-CD With Docker/01 Single Container CI-CD Workflow/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>01 Single Container CI CD Workflow - Docker Study Notes</title>
+        <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link href="../../../css/extra.css" rel="stylesheet">
+
+        <script src="../../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../..">Docker Study Notes</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../../..">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">01 Docker Essential</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../01 Docker Essential/01 Docker 101/">01 Docker 101</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/02 Docker Container/">02 Docker Container</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/03 Docker Lifecycle/">03 Docker Lifecycle</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/04 Docker Basic Commands/">04 Docker Basic Commands</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/05 Create Custom Image/">05 Create Custom Image</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/06 Wrap Web App in Docker/">06 Wrap Web App in Docker</a>
+</li>
+            
+<li >
+    <a href="../../01 Docker Essential/07 Using Docker Compose/">07 Using Docker Compose</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">02 CI CD With Docker</a>
+    <ul class="dropdown-menu">
+            
+<li class="active">
+    <a href="./">01 Single Container CI CD Workflow</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02  multi container</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../02  multi-container/01 Multi-container development environment/">01 Multi container development environment</a>
+</li>
+            
+<li >
+    <a href="../02  multi-container/02 Multi-container Continuous Integration/">02 Multi container Continuous Integration</a>
+</li>
+            
+<li >
+    <a href="../02  multi-container/03 Multi-container Continuous Deployment/">03 Multi container Continuous Deployment</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">03 Running container Like A Boss</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../03 Running container Like A Boss/01 Intro/">Using Container Like A Boss</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/02 Play With Nginx Server/">Play With Nginx Server</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/03 With Container Run/">With Container Run</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/04 Container vs VM/">Container vs VM</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/05 Windows Containers/">Windows Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/06 Assignment of Multiple Containers/">06 Assignment of Multiple Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/07 CLI Process Monitoring/">07 CLI Process Monitoring</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/08 Getting a Shell Inside a Container/">08 Getting a Shell Inside a Container</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/09 IP Fact/">09 IP Fact</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/10 Container Networking/">10 Container Networking</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/11 Assignments/">11 Assignments</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/12 Assignment/">12 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">04 Images</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../04 Images/01 Caching/">01 Caching</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/02 Tagging/">02 Tagging</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/03 Building Image/">03 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/04 Assignment/">04 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">05 Volumes</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../05 Volumes/01 Data Persistent/">01 Data Persistent</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/02 Data Volumes/">02 Data Volumes</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/03 Bind Mounting/">03 Bind Mounting</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/04 Assignment: Named Volumes/">04 Assignment: Named Volumes</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">06 Docker Compose</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../06 Docker Compose/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/02 Example/">02 Example</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/03 Assignment 01/">03 Assignment 01</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/04 Building Image/">04 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/05 Assignment 02/">05 Assignment 02</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">07 swarm</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../07 swarm/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../07 swarm/02 Swarm Service/">02 Swarm Service</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">08 Docker on AWS</a>
+    <ul class="dropdown-menu">
+            
+  <li class="dropdown-submenu">
+    <a href="#">01 ECS Quick Start</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/">01 ECS vs Fargate</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/02 IAM User/">02 IAM User</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/">03 First Container Launch</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/">04 ECS Pricing</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02 ECS Cluster Setup</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/">02 IAM Roles For ECS</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/">03 Core Infrastructure for ECS</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../../01 Docker Essential/07 Using Docker Compose/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../02  multi-container/01 Multi-container development environment/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/bmshamsnahid/My-Docker-Study"><i class="fa fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#single-container-workflow">Single Container Workflow</a></li>
+            <li><a href="#generating-a-project">Generating a Project</a></li>
+            <li><a href="#generating-dev-dockerfile">Generating Dev Dockerfile</a></li>
+            <li><a href="#building-image-from-dockerfile">Building Image From Dockerfile</a></li>
+            <li><a href="#run-container-in-interactive-mode">Run Container in Interactive Mode</a></li>
+            <li><a href="#enabling-hot-reload-using-docker-volume">Enabling Hot Reload Using Docker Volume</a></li>
+            <li><a href="#shorthand-of-docker-cli">Shorthand of Docker CLI</a></li>
+            <li><a href="#executing-test-cases">Executing Test Cases</a></li>
+            <li><a href="#live-update-test-cases">Live Update Test Cases</a></li>
+            <li><a href="#nginx-in-production-server">Nginx in Production Server</a></li>
+            <li><a href="#multi-step-docker-builds">Multi Step Docker Builds</a></li>
+            <li><a href="#setting-up-git-repository">Setting Up Git Repository</a></li>
+            <li><a href="#setting-up-travis-ci">Setting Up Travis CI</a></li>
+            <li><a href="#set-up-aws-elastic-beanstalk">Set Up AWS Elastic Beanstalk</a></li>
+            <li><a href="#travis-config-aws-deployment">Travis Config AWS Deployment</a></li>
+            <li><a href="#cleanup">Cleanup</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="single-container-workflow">Single Container Workflow</h2>
+<p>Let's use docker in a production type environment. The important thing to keep in mind, we first explain the workflow without docker. Instead we discuss outside services that we are going to use to set up this development workflow. Once we get the bird view of the workflow and get the core design behind the workflow, then we introduce the docker and find how docker can facilitate everything.</p>
+<p>We will create an application that will use docker and eventually push the application to <code>AWS</code>. Our workflow is going to be</p>
+<ul>
+<li>Develop</li>
+<li>Testing</li>
+<li>Deployment</li>
+</ul>
+<p>Also for any changes, we will repeat the workflow again.</p>
+<p><strong>Development Phase :</strong> Our dev workflow is starting by creating a git repository. This git repository is going to be the center of coordination of all the code we will write. Out git repository will have two types of branch, master and feature branch. We make changes on the feature branch. By filing a PR we will merge the feature branch to master branch. When we do the PR there will be a series of actions, defining how we govern the codebase. The master branch will contain the very clean copy of our code base.</p>
+<p><strong>Test Phase :</strong> As soon as we make the PR, the <code>Travis CI</code> will pull the new and updated code and run the test. If all the tests executed successfully, then we will merge the code to the master branch.</p>
+<p><strong>Production Phase :</strong> After merging the feature branch, We then again push the code to <code>Travis CI</code> and run tests of the code. Any changes on the master branch will eventually and automatically be hosted in the <code>AWS Beanstalk</code>.</p>
+<p>Now we need to find out how <code>docker</code> fits in this place. To execute this workflow, we do not need to make use of <code>Docker</code>. But using docker will make the workflow lot lot easier. Thats the soul purpose of docker. It's not necessarily a requirement, it just make developer life easier.</p>
+<p>Docker is not the focus here, it's more of using these 3rd party services (like, Github, Travis CI, AWS Beanstalk) with docker.</p>
+<h3 id="generating-a-project">Generating a Project</h3>
+<hr />
+<p>We will use a <code>react</code> for simplicity. To create a react project, make sure <code>node.js</code> is installed in your system. Then create the project named <code>frontend</code> by the followings,</p>
+<pre><code class="bash">npm create-react-app frontend
+</code></pre>
+
+<p>This will create the react project and install all the necessary dependencies.</p>
+<p>Now go to the project directory,</p>
+<pre><code class="bash">cd frontend
+</code></pre>
+
+<p>To run the test in local machine, we can use</p>
+<pre><code class="bash">npm run test
+</code></pre>
+
+<p>To build the application for future deployment, we can build using</p>
+<pre><code class="bash">npm run build
+</code></pre>
+
+<p>An finally to run the application in the local environment, we can use</p>
+<pre><code class="bash">npm run start
+</code></pre>
+
+<h3 id="generating-dev-dockerfile">Generating Dev Dockerfile</h3>
+<hr />
+<p>First go to the project directory. Here we will create a <code>Dockerfile</code> named <code>Dockerfile.dev</code>. The purpose of using <code>.dev</code> with the <code>Dockerfile</code> is to make clear that, this docker file is only using in the development environment.</p>
+<p>In future, we will use another <code>Dockerfile</code> with simply name <code>Dockerfile</code>, without any extension for our production environment.</p>
+<p>So, lets create the <code>Dockerfile.dev</code> in the project root directory,</p>
+<pre><code class="bash">touch Dockerfile.dev
+</code></pre>
+
+<p>Inside the <code>Dockerfile.dev</code> we will write configuration to make our image.</p>
+<p>Our <code>Dockerfile.dev</code> will be similar like the following.</p>
+<pre><code class="docker"># Define base image
+FROM node:alpine
+
+# Define working directory inside the container
+WORKDIR /app
+
+# Copy the package.json file to the project directory
+COPY package.json .
+# Install the dependencies
+RUN npm install
+
+# Copy all the source code from host machine to the container project directory
+COPY . ./
+
+# Start up command of the container to run the server
+CMD [&quot;npm&quot;, &quot;run&quot;, &quot;start&quot;]
+</code></pre>
+
+<h3 id="building-image-from-dockerfile">Building Image From Dockerfile</h3>
+<hr />
+<p>Since we are not using default name of <code>Dockerfile</code>, instead we are using <code>Dockerfile.dev</code> we have to specify the name during building image. To do so, we can use <code>-f</code> flag, that helps to specify the <code>docker file</code> name. This time, during development, our build instruction will be,</p>
+<pre><code class="bash">docker build -f Dockerfile.dev .
+</code></pre>
+
+<p>When we initially create our react application using <code>create-react-app</code>, the <code>create-react-app</code> automatically install all the <code>node modules</code> inside the <code>node_modules</code> directory. Now, when we are building the image out of the app, we will again installing the dependencies using <code>RUN npm install</code> instruction in the <code>Dockerfile.dev</code> file. We do not need the <code>node_modules</code> in the host machine, it usually increase the duration of image building process, since we are running the app inside the <code>container</code>. So we can delete the <code>node_modules</code> directory from the <code>host machine</code>.</p>
+<blockquote>
+<p><code>node_modules</code> directory is not necessary in the <code>host machine</code> project directory, it increase the time to build the image. We can delete <code>node_modules</code> from project directory.</p>
+</blockquote>
+<p>If we again run the previous instruction to build the image, we will get much faster output,</p>
+<pre><code class="bash">docker build -f Dockerfile.dev .
+</code></pre>
+
+<h3 id="run-container-in-interactive-mode">Run Container in Interactive Mode</h3>
+<p>Now we can run a container from the image by</p>
+<pre><code class="bash">docker run -it -p 3000:3000 IMAGE_ID
+</code></pre>
+
+<p>If we observe closely, we can notice, while we made changes in the codebase, the hot reloading is not working. The image was build on the snapshot of files. One way is after each changes in the code base we will rebuild the image. But this is a costly and inefficient approach. So we need to find a way to enable hot reload inside inside the image.</p>
+<h3 id="enabling-hot-reload-using-docker-volume">Enabling Hot Reload Using Docker Volume</h3>
+<p>In the last section, we made changes in a file and the changes was not reflected in the container. Now we will figure out a way to solve the issue without stopping, rebuild and restarting the container.</p>
+<p>A docker volume essentially a mapping of directory between host machine and container.</p>
+<p>With docker volume, we can use the reference of local machine directory from the host machine. In this case, we do not copy the directory of the local machine in the container, instead, use the host machine directory by reference from container.</p>
+<p>To use the volume mapping we need to use the followings,</p>
+<pre><code class="bash">docker run -p 3000:3000 -v /app/node_modules -v $(pwd):/app image_id
+</code></pre>
+
+<p>Here we have used two switches. Each switch has a <code>-v</code> flag which is used to set up a volume. The <code>${pwd}</code> is stands for <code>print working directory</code>, used to get the current application path.</p>
+<p>Here first switch is <code>-v /app/node_modules</code>, is not using the reference. Instead it says, not to map the <code>/app/node_modules</code> of the host machine.</p>
+<p>For the second switch, <code>-v ${pwd}:/app</code>, we are using the host machine volume. The <code>:</code> stands when we use host machine directory as reference in the docker.</p>
+<p>If the hot reload not work, need to create a <code>.env</code> in the <code>root directory</code> and need to add <code>CHOKIDAR_USEPOLLING=true</code>.
+The <code>.env</code> file should be</p>
+<pre><code>CHOKIDAR_USEPOLLING=true
+</code></pre>
+
+<h3 id="shorthand-of-docker-cli">Shorthand of Docker CLI</h3>
+<hr />
+<p>The downside of previous run command is it is ridiculously long. We have to specify the <code>port-mapping</code>, <code>volume-mapping</code> and also the image id. With docker compose we can dramatically shorten the command to run the container in development phase. Let's create a <code>docker-compose</code> inside the project directory and encode the port mapping and volume mapping.</p>
+<p>First go to the project root directory and create a file named <code>docker-compose.yml</code></p>
+<pre><code class="bash">touch docker-compose.yml
+</code></pre>
+
+<p>Our <code>docker-compose.yml</code> file will be like,</p>
+<pre><code class="yml">version: &quot;3&quot;
+services:
+  web:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - &quot;3000:3000&quot;
+    volumes:
+      - /app/node_modules
+      - .:/app
+</code></pre>
+
+<p>With docker compose, from now on, we can simple run the application by,</p>
+<pre><code class="bash">docker-compose up
+</code></pre>
+
+<h3 id="executing-test-cases">Executing Test Cases</h3>
+<hr />
+<p>Now we have a solid development infrastructure for the react application with docker container.</p>
+<p>It's time to focus on running the tests inside the container. First we run the tests to our development environment and then shift to <code>Travis CI</code>.</p>
+<p>The good things is, running test cases inside the container is very much straight forward. To run the test cases, we have to follow two steps,</p>
+<ol>
+<li>Create the image out of the <code>Dockerfile</code></li>
+<li>Override the startup command with the test command</li>
+</ol>
+<p>First let's build the image,</p>
+<pre><code class="bash">docker build -f Dockerfile.dev .
+</code></pre>
+
+<p>Now, to override our container startup command and replace it with the <code>npm run test</code>, we can do,</p>
+<pre><code class="bash">docker run image_id npm run test
+</code></pre>
+
+<p>This should run all the test cases for the app. To open the test runner in an interactive mode, we can utilize the <code>-it</code> flag.</p>
+<pre><code class="bash">docker run -it image_id npm run test
+</code></pre>
+
+<p>Now the test suite will run in the interactive mode.</p>
+<h3 id="live-update-test-cases">Live Update Test Cases</h3>
+<hr />
+<p>If we run the tests in the container and update the test suite, we will notice the test cases changes does not impact inside the container.</p>
+<p>May be you got the reason. Here we created a special container by <code>docker build -f Dockerfile.dev .</code> that take the snapshot of the working files and put then inside the container. Now this special temporary container does not have volume mapping set up. So changes inside the files, does not impact the test cases changes.</p>
+<p>To resolve the issue we can take multiple approach. One is, start the container with <code>docker compose</code> and then run the <code>docker exec</code> to use the web service. Let's try this one,</p>
+<p>From one terminal, run the container with docker compose</p>
+<pre><code class="bash">docker-compose up
+</code></pre>
+
+<p>Now from another terminal, first take the running container id by</p>
+<pre><code class="bash">docker ps
+</code></pre>
+
+<p>From the out put we can get the <code>container_id</code> and run <code>npm run test</code> directly inside the container,</p>
+<pre><code class="bash">docker exec -it container_id npm run test
+</code></pre>
+
+<p>This should run the test suite in interactive mode with live update.</p>
+<p>Now this solution is not as good as it should be.</p>
+<p>Here in the <code>docker-compose.yml</code> file we will add another service, which will be solely responsible for run the test suite whenever we change the files.</p>
+<p>We already have a service named <code>web</code> that is responsible for run the web application. Our new service, we can named <code>tests</code> will be responsible for run the test suites. Except the <code>web</code> service, the <code>tests</code> service do not require the <code>port-mapping</code>, instead it needs to override the start up command. In this <code>tests</code> service the startup command should be <code>npm run test</code>.</p>
+<p>Our new <code>docker-compose.yml</code> file will be,</p>
+<pre><code class="yml">version: &quot;3&quot;
+services:
+  web:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - &quot;3000:3000&quot;
+    volumes:
+      - /app/node_modules
+      - .:/app
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - .:/app
+    command: [&quot;npm&quot;, &quot;run&quot;, &quot;test&quot;]
+</code></pre>
+
+<p>Now run the container with a new build</p>
+<pre><code class="bash">docker-compose up --build
+</code></pre>
+
+<p>This will run both, the web application and the test suite.</p>
+<p>So bottom line is both approaches has some downside. For the first approach, we have to find out the running container id and remember the <code>docker exec</code> command.</p>
+<p>For the second approach, we get the test suite result in the docker log area. Also in this approach we can get the test suite in an interactive mode.</p>
+<h3 id="nginx-in-production-server">Nginx in Production Server</h3>
+<hr />
+<p>In development phase, we have a development server provided by the <code>create-react-app</code> that handle the request of port <code>3000</code>. In production, we need a web server whose sole purpose will be to respond to browser request. In this case, we can use an extremely popular web server <code>Nginx</code>. It's a minimal server basically do the routing.</p>
+<p>So we create a separate docker file, that will create a production version of web container. This production version of docker container will start an instance of Nginx. This <code>Nginx</code> server will be used to serve our <code>index.html</code> and <code>main.js</code> file.</p>
+<h3 id="multi-step-docker-builds">Multi Step Docker Builds</h3>
+<hr />
+<p>To use <code>Nginx</code> in the production environment, we will need</p>
+<ul>
+<li>Build Phase (To build the react app)</li>
+<li>Use <code>Node</code> base image</li>
+<li>Copy the <code>package.json</code> file</li>
+<li>Install dependencies</li>
+<li>Build the app by <code>npm run build</code></li>
+<li>Run Phase (To run the Nginx server)</li>
+<li>Use <code>Nginx</code> image</li>
+<li>Copy the build file generated in the <code>build phase</code></li>
+<li>Start the <code>Nginx</code> server</li>
+</ul>
+<p>Let's create a docker file for our production environment,</p>
+<pre><code class="bash">touch Dockerfile
+</code></pre>
+
+<p>In the <code>Dockerfile</code> we will have two distinctly different section. One is for build the app and second is run the Nginx server with build files.</p>
+<blockquote>
+<p><code>Nginx</code> base image has already integrated a startup command. We do not explicitly start the <code>Nginx Server</code>.</p>
+</blockquote>
+<p>In the <code>Run Phage</code>, when we will use the <code>Nginx</code> using docker, it will automatically remove all files and folder from the <code>Build Phase</code> except the <code>build</code> directory. So our production image will be very small.</p>
+<p>Our <code>Dockerfile</code> will be,</p>
+<pre><code class="docker">FROM node:alpine
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx
+COPY --from=0 /app/build /usr/share/nginx/html
+</code></pre>
+
+<p>Now, let's build the image</p>
+<pre><code class="bash">docker build .
+</code></pre>
+
+<p>The end result of the <code>build</code> command will be an <code>image_id</code>.</p>
+<p>To to run the container, since <code>Nginx</code> is a web server, we have to do the port mapping. <code>Nginx</code> use <code>80</code> as default port.</p>
+<p>We can run the container using the following,</p>
+<pre><code class="bash">docker run -p 8080:80 image_id
+</code></pre>
+
+<p>Now, if we go to <code>http://localhost:8080</code>, we should see the react app running.</p>
+<p>So, now we got a docker application, that can be build our application and serve the application from a <code>Nginx</code> server. Now we need to ship all our work to the outside world, the deployment.</p>
+<h3 id="setting-up-git-repository">Setting Up Git Repository</h3>
+<hr />
+<p>Let's create a git repository named <code>ix-docker-react</code>.</p>
+<p>Please make sure the git repository is public. Off-course, the private repo will work but for private we have to set up couple of additional config.</p>
+<p>Push all your code base to the github master branch. Make sure in the github, your react-application source with <code>Dockerfile</code> exist. You can follow the commands,</p>
+<pre><code class="bash">git init
+git add .
+git commit -m 'initial commit'
+git remote add origin remote_git_repository_address
+git push origin master
+</code></pre>
+
+<h3 id="setting-up-travis-ci">Setting Up Travis CI</h3>
+<hr />
+<p>We have not discussed about <code>Travis CI</code> a lot. <code>Travis CI</code> essentially set a sky limit for our code base, we can do whatever we want.</p>
+<p>When we push some changes to the github, github taps the <code>Travis CI</code> that some code changes. In this case, <code>Travis CI</code> pull the code base and do whatever we are asked to. Some developer use <code>Travis CI</code> for test the code base after any changes, someone use the <code>Travis CI</code> to deploy the codebase. In our case, we will use <code>Travis CI</code> for both, <code>Test the codebase</code> and <code>Deploy to the AWS</code>.</p>
+<p>To set up <code>Travis CI</code>,</p>
+<ul>
+<li>Sign in <code>Travis CI</code> with your github account (For simplicity)</li>
+<li>Enable Github App (This will load all your github repo in <code>Travis CI</code> dashboard)</li>
+<li>Find <code>ix-docker-react</code> and enable tracking by tapping the switch button</li>
+</ul>
+<blockquote>
+<p><code>Travis CI</code> ui is being changed time to time. If you have trouble finding the green switch button, please find legacy site <a href="https://travis-ci.org/account/repositories">here</a> and tap the button</p>
+</blockquote>
+<p>Now we have to explicitly tell <code>Travis CI</code> what to do when a code base is being changed. For now we ignore the <code>AWS Deployment</code> and focus on testing.</p>
+<p>We essentially tell <code>Travis CI</code> how to start the <code>Docker</code>, run the test suite and interpret the test result. In order to do so, we will require a file <code>.travis.yml</code> in the project root directory.</p>
+<p>Let's create the file <code>.travis.yml</code>,</p>
+<pre><code class="bash">touch .travis.yml
+</code></pre>
+
+<p>In the <code>.travis.yml</code> we make sure the <code>super user</code> privilege is being configured. We require the <code>super user</code> privilege for running the docker.</p>
+<p>We also specify that, we are using the <code>docker</code>, so <code>Travis CI</code> will bring a copy of the <code>Docker</code>.</p>
+<p>Finally, we build an image out of the <code>Dockerfile.dev</code> to run our test suite.</p>
+<p>In our local machine, after we build the <code>image</code> we used to get the <code>image_id</code> and used the <code>image_id</code> to run the container. In <code>Travis CI</code>, we can not manually copy and paste the <code>image_id</code>, so we can utilize the use of <code>tagging</code>.</p>
+<p>Our <code>.travis.yml</code> file should be like the following,</p>
+<pre><code class="yml">language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t docker_username/github_repo_name -f Dockerfile.dev
+
+script:
+  - docker run -e CI=true docker_username/github_repo_name npm run test -- --coverage
+</code></pre>
+
+<blockquote>
+<p>As tag, we can use any name. But its a good practice to use the convention <code>docker_username</code>/<code>github_repo_name</code></p>
+<p>Default behaviour of <code>Jest</code> is run the test for the first time and bring an interactive terminal to run test according to developer input. With <code>-- -- coverage</code> we can change that default behaviour and the will run once and return status code and terminate.</p>
+<p>When test results return with status code <code>0</code>, means test coverage is as expected</p>
+</blockquote>
+<p>Now push the changed codebase to the github repository.</p>
+<pre><code class="bash">git add .travis.yml
+git commit -m 'Added travis file'
+git push origin master
+</code></pre>
+
+<p>This should trigger the test in the <code>Travis CI</code>. In the dashboard, inside <code>react-docker</code> application, we should see the test suite running and should get passed all the tests.</p>
+<p>Now, we have a pipeline in place to automatically watch out our github repository for changes and pull down the source code to run the tests and report back if everything is alright.</p>
+<h3 id="set-up-aws-elastic-beanstalk">Set Up AWS Elastic Beanstalk</h3>
+<hr />
+<p>Elastic Beanstalk is the easiest way to run <code>Single Container</code> application in <code>AWS Infrastructure</code>.</p>
+<p>When we deploy a code base to <code>AWS Beanstalk</code> using <code>Travis CI</code>, in background, the <code>Travis CI</code> upload a zipped version of the code to the <code>S3 Bucket</code> and tap the <code>Beanstalk</code> to notify there's a new version of code is being pushed. Then the <code>AWS Beanstalk</code> pull the codebase from the <code>S3 Bucket</code> and redeploy. And good things is, when we create a <code>AWS Elastic Beanstalk</code> environment, this <code>S3 Bucket</code> is being automatically created.</p>
+<p><code>AWS</code> recently update the <code>AWS Elastic Beanstalk</code> that can work with <code>docker compose</code>. By default, when platform branch is <code>Docker Running on 64bit Linux</code>, then the new feature with docker-compose works. In our case we will make use vanilla <code>Dockerfile</code>.</p>
+<p>When we set a <code>docker</code> environment in the <code>AWS Beanstalk</code>, <code>AWS Beanstalk</code> create a virtual machine that's sole purpose is to run the docker container we provide. In the <code>AWS Beanstalk</code> there is already an built in <code>load-balancer</code>. So whenever the traffic flows increase, the <code>AWS Beanstalk</code> automatically increase the number of <code>Virtual Machine</code>, as well as, our container and react-app inside the container.</p>
+<p>Login to your <code>AWS</code> account and select the <code>Elastic Beanstalk</code> service.</p>
+<p>Now create an application with the following config,</p>
+<ul>
+<li>Application name can be anything, I am using <code>ix-docker-react</code></li>
+<li>Platform should be <code>Docker</code></li>
+<li>Platform branch should be <code>Docker Running on 64bit Amazon Linux</code></li>
+<li>Platform version as <code>AWS Recommended</code>, I am using <code>2.16.4</code></li>
+</ul>
+<p>Creating the application environment might take couple of minutes. After the environment being created, the environment will be listed in the <code>environment</code> section.</p>
+<h3 id="travis-config-aws-deployment">Travis Config AWS Deployment</h3>
+<hr />
+<p>For deployment, we will require the following config,</p>
+<ul>
+<li><code>provider</code>, should be <code>elasticbeanstalk</code>, already configured and heavy lifting by the <code>Travis CI</code></li>
+<li><code>region</code>, Where the <code>AWS Elastic Beanstalk</code> is being created</li>
+<li><code>app</code>, our <code>Elastic Beanstalk</code> app name</li>
+<li><code>env</code>, our <code>Elastic Beanstalk</code> environment name</li>
+<li><code>bucket_name</code>, automatically generated bucket name by the <code>Elastic Beanstalk</code></li>
+<li><code>bucket_path</code>, same as the <code>app</code> name</li>
+<li><code>on -&gt; branch</code>, on which branch code changes, we should re-deploy the code base</li>
+<li><code>credentials</code>, to get the credentials to access <code>Elastic Beanstalk</code> by <code>Travis CI</code>, we have to create a new IAM user with full programmatic access to <code>Elastic Beanstalk</code>. For security purpose, we will use the <code>Travis CI</code> environment variables to store our aws access key and secret.</li>
+</ul>
+<p>Our new <code>.travis.yml</code> file should be,</p>
+<pre><code class="yml">language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t docker_user_name/ix-docker-react -f Dockerfile.dev .
+
+script:
+  - docker run -e CI=true docker_user_name/ix-docker-react npm run test -- --coverage
+
+deploy:
+  provider: elasticbeanstalk
+  region: &quot;ap-south-1&quot;
+  app: &quot;ix-docker-react&quot;
+  env: &quot;Dockerreact-env&quot;
+  bucket_name: &quot;elasticbeanstalk-ap-south-1-366735605679&quot;
+  bucket_path: &quot;ix-docker-react&quot;
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+</code></pre>
+
+<blockquote>
+<p>In the deploy config, the path name of the <code>S3</code> bucket should be same as the app name.</p>
+</blockquote>
+<p>In the <code>Elastic Beanstalk</code>, it should open port <code>80</code> for <code>Nginx</code>. We have to specify the port in the <code>Dockerfile</code>. We can expose a port in the <code>Elastic Beanstalk</code> with <code>Dockerfile</code> by <code>EXPOSE 80</code>. Our new <code>Dockerfile</code> with updated configuration should be</p>
+<pre><code class="docker">FROM node:alpine
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx
+EXPOSE 80
+COPY --from=0 /app/build /usr/share/nginx/html
+</code></pre>
+
+<p>Now, if we push the changes to the <code>github</code> the application should be deployed to the <code>AWS Elastic Beanstalk</code>.</p>
+<p>From <code>Elastic Beanstalk</code> we can get the web url and access our react application.</p>
+<p>Now we have a complete <code>CI/CD</code> with <code>docker</code>, <code>github</code>, <code>Travis CI</code> and <code>AWS Beanstalk</code>. In a team, engineers make commit in the feature branch. Other engineers will review and merge the code base to master branch. The moment, codebase is being merged to the master branch, the <code>CI/CD</code> will be triggered and make the deployment.</p>
+<h3 id="cleanup">Cleanup</h3>
+<hr />
+<p>For the <code>AWS Beanstalk</code>, when we create a environment, the <code>AWS Beanstalk</code> create a <code>EC2 Instance</code> internally. This <code>EC2 Instance</code> is costing money. So after we are done our experiments, we need to delete the <code>AWS Beanstalk</code> application. We can delete the <code>Beanstalk Application</code> from the dashboard.</p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021 <a href="https://shams-nahid.com/">Shams Nahid</a>.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js" defer></script>
+        <script src="../../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Shams Nahid">
+        <link rel="canonical" href="http://docker-study.shams-nahid.com/Notes/01 Docker Essential/04 Docker Basic Commands/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>04 Docker Basic Commands - Docker Study Notes</title>
+        <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link href="../../../css/extra.css" rel="stylesheet">
+
+        <script src="../../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../..">Docker Study Notes</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../../..">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">01 Docker Essential</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../01 Docker 101/">01 Docker 101</a>
+</li>
+            
+<li >
+    <a href="../02 Docker Container/">02 Docker Container</a>
+</li>
+            
+<li >
+    <a href="../03 Docker Lifecycle/">03 Docker Lifecycle</a>
+</li>
+            
+<li class="active">
+    <a href="./">04 Docker Basic Commands</a>
+</li>
+            
+<li >
+    <a href="../05 Create Custom Image/">05 Create Custom Image</a>
+</li>
+            
+<li >
+    <a href="../06 Wrap Web App in Docker/">06 Wrap Web App in Docker</a>
+</li>
+            
+<li >
+    <a href="../07 Using Docker Compose/">07 Using Docker Compose</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">02 CI CD With Docker</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/01 Single Container CI-CD Workflow/">01 Single Container CI CD Workflow</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02  multi container</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/01 Multi-container development environment/">01 Multi container development environment</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/02 Multi-container Continuous Integration/">02 Multi container Continuous Integration</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/03 Multi-container Continuous Deployment/">03 Multi container Continuous Deployment</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">03 Running container Like A Boss</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../03 Running container Like A Boss/01 Intro/">Using Container Like A Boss</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/02 Play With Nginx Server/">Play With Nginx Server</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/03 With Container Run/">With Container Run</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/04 Container vs VM/">Container vs VM</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/05 Windows Containers/">Windows Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/06 Assignment of Multiple Containers/">06 Assignment of Multiple Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/07 CLI Process Monitoring/">07 CLI Process Monitoring</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/08 Getting a Shell Inside a Container/">08 Getting a Shell Inside a Container</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/09 IP Fact/">09 IP Fact</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/10 Container Networking/">10 Container Networking</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/11 Assignments/">11 Assignments</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/12 Assignment/">12 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">04 Images</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../04 Images/01 Caching/">01 Caching</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/02 Tagging/">02 Tagging</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/03 Building Image/">03 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/04 Assignment/">04 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">05 Volumes</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../05 Volumes/01 Data Persistent/">01 Data Persistent</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/02 Data Volumes/">02 Data Volumes</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/03 Bind Mounting/">03 Bind Mounting</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/04 Assignment: Named Volumes/">04 Assignment: Named Volumes</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">06 Docker Compose</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../06 Docker Compose/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/02 Example/">02 Example</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/03 Assignment 01/">03 Assignment 01</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/04 Building Image/">04 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/05 Assignment 02/">05 Assignment 02</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">07 swarm</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../07 swarm/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../07 swarm/02 Swarm Service/">02 Swarm Service</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">08 Docker on AWS</a>
+    <ul class="dropdown-menu">
+            
+  <li class="dropdown-submenu">
+    <a href="#">01 ECS Quick Start</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/">01 ECS vs Fargate</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/02 IAM User/">02 IAM User</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/">03 First Container Launch</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/">04 ECS Pricing</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02 ECS Cluster Setup</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/">02 IAM Roles For ECS</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/">03 Core Infrastructure for ECS</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../03 Docker Lifecycle/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../05 Create Custom Image/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/bmshamsnahid/My-Docker-Study"><i class="fa fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#docker-basic-commands">Docker Basic Commands</a></li>
+            <li><a href="#creating-and-run-a-container-from-an-image">Creating and run a container from an image</a></li>
+            <li><a href="#override-startup-or-default-command">Override startup or default command</a></li>
+            <li><a href="#listing-container-in-local-machine">Listing container in local machine</a></li>
+            <li><a href="#restart-stopped-docker-container">Restart stopped docker container</a></li>
+            <li><a href="#removing-stopped-containers">Removing stopped containers</a></li>
+            <li><a href="#retrieve-the-logs-of-a-container">Retrieve the logs of a container</a></li>
+            <li><a href="#stopping-a-container">Stopping a container</a></li>
+            <li><a href="#multiple-commands-in-container">Multiple commands in container</a></li>
+            <li><a href="#start-a-terminalshell-of-container-context-along-with-docker-start">Start a terminal/shell of container context along with docker start</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="docker-basic-commands">Docker Basic Commands</h2>
+<h3 id="creating-and-run-a-container-from-an-image">Creating and run a container from an image</h3>
+<hr />
+<pre><code class="bash">docker run hello-world
+</code></pre>
+
+<p>Here, <code>docker</code> is the <code>docker-client</code> name, <code>run</code> is create and run the <code>container</code> and <code>hello-world</code> is the <code>docker image</code> name.</p>
+<p>With this command we also run the <code>start-up</code> script. That <code>start-up</code> script is responsible to print the text <code>Hello from Docker!</code>.</p>
+<h3 id="override-startup-or-default-command">Override startup or default command</h3>
+<hr />
+<p>Anytime we execute <code>docker run</code> with an image,</p>
+<ul>
+<li>We took the file snapshot to the physical storage</li>
+<li>Execute the startup script</li>
+</ul>
+<p>To override the default startup command, we can pass our command as 4th parameter.</p>
+<pre><code class="bash">docker run busybox echo hi there
+</code></pre>
+
+<p>We will get the output</p>
+<pre><code class="bash">hi there
+</code></pre>
+
+<p>Here, <code>busybox</code> is the image and <code>echo hi there</code> is our over ride start up command.</p>
+<p>We use <code>busybox</code> image instead of <code>hello-world</code> because <code>busy box</code> has the program like <code>echo</code>.</p>
+<h3 id="listing-container-in-local-machine">Listing container in local machine</h3>
+<hr />
+<p>Check the currently running container.</p>
+<pre><code class="bash">docker ps
+</code></pre>
+
+<p>If there is no docker container is running the list will be empty.</p>
+<p>Let's run a container for long time and check it <code>docker ps</code> works.</p>
+<pre><code class="bash">docker run busybox ping google.com
+</code></pre>
+
+<p>This will run a significant time to measure the latency. In the meantime let's run the listing command</p>
+<pre><code class="bash">docker ps
+</code></pre>
+
+<p>Now we should see the <code>busybox</code> is running along with it's other properties.</p>
+<p>To check all the containers ever been created in the local machine, we can use a flag <code>all</code>.</p>
+<pre><code class="bash">docker pas --all
+</code></pre>
+
+<p>This will output all the containers we been created in local machine.</p>
+<h3 id="restart-stopped-docker-container">Restart stopped docker container</h3>
+<hr />
+<p>We can restart the docker container in future at any point.</p>
+<p>To do so, we need the <code>container_id</code>. We can get the <code>container_id</code> by following command</p>
+<pre><code class="bash">docker ps --all
+</code></pre>
+
+<p>In the first column of the table, contains <code>container_id</code>.</p>
+<p>Now we can start the stopped docker using the following commands</p>
+<pre><code class="bash">docker start -a cee8f8c62478
+</code></pre>
+
+<p>Here <code>-a</code> watch out the output of the <code>container</code> and print it in the <code>console</code>.</p>
+<h3 id="removing-stopped-containers">Removing stopped containers</h3>
+<hr />
+<p>We can see all the containers we run before by</p>
+<pre><code class="bash">docker ps --all
+</code></pre>
+
+<p>To remove all these containers along with the build file we can use the following</p>
+<pre><code class="bash">docker system prune
+</code></pre>
+
+<blockquote>
+<p>With <code>docker system prune</code>, we have to re-download all the images we downloaded earlier</p>
+</blockquote>
+<h3 id="retrieve-the-logs-of-a-container">Retrieve the logs of a container</h3>
+<hr />
+<p>In some scenario, we might need to see the output of the docker container.</p>
+<p>For example,</p>
+<pre><code class="bash"># get ready the busybox container that will print `Hi there!`
+docker create busybox echo Hi there!
+# start the container
+docker start container_id
+</code></pre>
+
+<p>Now the docker provide the output <code>Hi there</code>, but since we did not use <code>-a</code> flag, the output will not be printed in the console.</p>
+<p>To see logs, we can use the following commands</p>
+<pre><code class="bash">docker logs container_id
+</code></pre>
+
+<p>This will give us the output <code>Hi there!</code>.</p>
+<blockquote>
+<p><code>docker logs</code> does not re-run or restart the docker <code>container</code>. It just get the logs emitted from the <code>container</code>.</p>
+</blockquote>
+<h3 id="stopping-a-container">Stopping a container</h3>
+<hr />
+<p>To stop a docker container we can use the following method</p>
+<ul>
+<li><code>Stop</code> a container by <code>docker stop container_id</code></li>
+<li><code>Kill</code> a container by <code>docker kill container_id</code></li>
+</ul>
+<p>When we use the <code>stop</code> command a <code>SIGTERM</code> signal is passed to the primary process of the container. It gives the process <code>10 seconds</code> to close the process and do the post process, like save files, do logging etc. If the primary process does not close within <code>10 seconds</code>, it then pass <code>SIGKILL</code> signal that kill the process immediately.</p>
+<p>The <code>kill</code> command pass <code>SIGKILL</code> signal that kill the process immediately.</p>
+<blockquote>
+<p><code>SIGTERM</code> stands for <code>Terminate Signal</code>. <code>SIGKILL</code> stands for <code>Kill Signal</code>.</p>
+</blockquote>
+<h3 id="multiple-commands-in-container">Multiple commands in container</h3>
+<hr />
+<p>Let's say we need to tweak the <code>redis-cli</code>. In this case, if redis server is installed in my local machine, in one terminal, we can start the <code>redis server</code>. In another terminal, we can start the <code>redis-cli</code>.</p>
+<p>With <code>docker</code>, if we install the <code>redis</code>, we can start the redis server by the startup command. But in this case, if we go to another terminal window and try to start the <code>redis-cli</code>, we can not access it. Because, from a regular machine terminal window, we can not access the redis server that is running in a isolated namespace.</p>
+<p><strong>Example :</strong></p>
+<p>Lets run the <code>redis</code> container by</p>
+<pre><code class="bash">docker run redis
+</code></pre>
+
+<p>This will install the redis server and start the server also.</p>
+<p>Now If we go to another terminal and try to access <code>redis-cli</code>, we will get an error.</p>
+<p><strong>Solution :</strong></p>
+<p>To execute the <code>redis-cli</code> inside the <code>container</code> we need to follow the skeleton,</p>
+<pre><code class="bash">docker exec -it container_id redis-cli
+</code></pre>
+
+<p>This will execute the <code>redis-cli</code> command inside the container and with <code>-it</code> flag, we can pass the command through the terminal and get the emitted output by the container inside our terminal.</p>
+<p>In this way we can interact with redis server like</p>
+<pre><code class="bash">127.0.0.1:6379&gt; set myVal 5
+127.0.0.1:6379&gt; get MyVal
+</code></pre>
+
+<blockquote>
+<p>Here the <code>exec</code> stands for <code>Execute</code>. Without <code>-it</code> the <code>redis-cli</code> will run inside the <code>container</code> but we can not interact using host machine terminal.</p>
+<p>Each process running in the docker or <code>virtual linux environment</code> contains <code>STDIN</code>, <code>STDOUT</code>, <code>STDERR</code>. The <code>STDIN</code> stands for <code>Standard In</code>, <code>STDOUT</code> stands for <code>Standard Output</code> and <code>STDERR</code> stands for <code>Standard Error</code>. <code>-it</code> is combined of two standalone flag. <code>-i</code> stands connect with processes <code>STDIN</code> and <code>-t</code> ensure formatted text.</p>
+</blockquote>
+<h3 id="start-a-terminalshell-of-container-context-along-with-docker-start">Start a terminal/shell of container context along with docker start</h3>
+<hr />
+<p>May be we do not want to always use the <code>exec</code> command to open a terminal for a container every time we want to execute some command inside the container.</p>
+<p>To open a terminal inside the container we can use the following command</p>
+<pre><code class="bash">docker exec -it container_id sh
+</code></pre>
+
+<p>Now a terminal inside the container will be appeared and we can execute all the <code>unix</code> command there. For example we can run the previous <code>redis-cli</code> command here and interact with <code>redis-server</code>.</p>
+<blockquote>
+<p><code>sh</code> is program execute inside the container, known as <code>command processor</code>. Similar programs are <code>zsh</code>, <code>powershell</code>, <code>bash</code> etc. Traditionally most of the container has <code>sh</code> program included.</p>
+</blockquote>
+<p>If we want to run the terminal inside the container on startup, we can use the following</p>
+<pre><code class="bash">docker run -it image_name sh
+</code></pre>
+
+<p>This will start the <code>container</code> and also start a terminal in the <code>container</code> context.</p>
+<blockquote>
+<p>This <code>sh</code> program will prevent other startup command supposed to be run during the <code>container</code> start.</p>
+</blockquote></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021 <a href="https://shams-nahid.com/">Shams Nahid</a>.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js" defer></script>
+        <script src="../../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

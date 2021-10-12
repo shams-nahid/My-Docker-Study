@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Shams Nahid">
+        <link rel="canonical" href="http://docker-study.shams-nahid.com/Notes/01 Docker Essential/06 Wrap Web App in Docker/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>06 Wrap Web App in Docker - Docker Study Notes</title>
+        <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link href="../../../css/extra.css" rel="stylesheet">
+
+        <script src="../../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../..">Docker Study Notes</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../../..">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">01 Docker Essential</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../01 Docker 101/">01 Docker 101</a>
+</li>
+            
+<li >
+    <a href="../02 Docker Container/">02 Docker Container</a>
+</li>
+            
+<li >
+    <a href="../03 Docker Lifecycle/">03 Docker Lifecycle</a>
+</li>
+            
+<li >
+    <a href="../04 Docker Basic Commands/">04 Docker Basic Commands</a>
+</li>
+            
+<li >
+    <a href="../05 Create Custom Image/">05 Create Custom Image</a>
+</li>
+            
+<li class="active">
+    <a href="./">06 Wrap Web App in Docker</a>
+</li>
+            
+<li >
+    <a href="../07 Using Docker Compose/">07 Using Docker Compose</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">02 CI CD With Docker</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/01 Single Container CI-CD Workflow/">01 Single Container CI CD Workflow</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02  multi container</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/01 Multi-container development environment/">01 Multi container development environment</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/02 Multi-container Continuous Integration/">02 Multi container Continuous Integration</a>
+</li>
+            
+<li >
+    <a href="../../02 CI-CD With Docker/02  multi-container/03 Multi-container Continuous Deployment/">03 Multi container Continuous Deployment</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">03 Running container Like A Boss</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../03 Running container Like A Boss/01 Intro/">Using Container Like A Boss</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/02 Play With Nginx Server/">Play With Nginx Server</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/03 With Container Run/">With Container Run</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/04 Container vs VM/">Container vs VM</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/05 Windows Containers/">Windows Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/06 Assignment of Multiple Containers/">06 Assignment of Multiple Containers</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/07 CLI Process Monitoring/">07 CLI Process Monitoring</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/08 Getting a Shell Inside a Container/">08 Getting a Shell Inside a Container</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/09 IP Fact/">09 IP Fact</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/10 Container Networking/">10 Container Networking</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/11 Assignments/">11 Assignments</a>
+</li>
+            
+<li >
+    <a href="../../03 Running container Like A Boss/12 Assignment/">12 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">04 Images</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../04 Images/01 Caching/">01 Caching</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/02 Tagging/">02 Tagging</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/03 Building Image/">03 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../04 Images/04 Assignment/">04 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">05 Volumes</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../05 Volumes/01 Data Persistent/">01 Data Persistent</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/02 Data Volumes/">02 Data Volumes</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/03 Bind Mounting/">03 Bind Mounting</a>
+</li>
+            
+<li >
+    <a href="../../05 Volumes/04 Assignment: Named Volumes/">04 Assignment: Named Volumes</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">06 Docker Compose</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../06 Docker Compose/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/02 Example/">02 Example</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/03 Assignment 01/">03 Assignment 01</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/04 Building Image/">04 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../06 Docker Compose/05 Assignment 02/">05 Assignment 02</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">07 swarm</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../07 swarm/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../07 swarm/02 Swarm Service/">02 Swarm Service</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">08 Docker on AWS</a>
+    <ul class="dropdown-menu">
+            
+  <li class="dropdown-submenu">
+    <a href="#">01 ECS Quick Start</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/">01 ECS vs Fargate</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/02 IAM User/">02 IAM User</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/">03 First Container Launch</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/">04 ECS Pricing</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02 ECS Cluster Setup</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/">02 IAM Roles For ECS</a>
+</li>
+            
+<li >
+    <a href="../../08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/">03 Core Infrastructure for ECS</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../05 Create Custom Image/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../07 Using Docker Compose/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/bmshamsnahid/My-Docker-Study"><i class="fa fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#wrap-web-app-in-docker">Wrap Web App in Docker</a></li>
+            <li><a href="#create-a-nodejs-app">Create a Node.js app</a></li>
+            <li><a href="#selecting-a-base-image">Selecting A Base Image</a></li>
+            <li><a href="#load-application-files">Load Application Files</a></li>
+            <li><a href="#port-mapping">Port Mapping</a></li>
+            <li><a href="#create-a-working-directory">Create A Working Directory</a></li>
+            <li><a href="#avoid-unnecessary-builds">Avoid Unnecessary Builds</a></li>
+            <li><a href="#final-docker-file">Final Docker File</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="wrap-web-app-in-docker">Wrap Web App in Docker</h2>
+<p>Let's create a tiny node.js web application and wrap it inside the <code>docker container</code>.</p>
+<p>Then we should access the app from the browser of the local machine. Right now we will not be worry about deploying the app.</p>
+<h3 id="create-a-nodejs-app">Create a Node.js app</h3>
+<hr />
+<p>First create a directory, enter into it and run</p>
+<pre><code class="bash">npm init -y
+</code></pre>
+
+<p>Install <code>express.js</code> package by</p>
+<pre><code class="bash">npm i express
+</code></pre>
+
+<p>Now create a file named <code>index.js</code> and create a server. <code>index.js</code> should be like following</p>
+<pre><code class="js">const express = require('express');
+const app = express();
+
+// from browser, a get request in `/` route, should return `Hi There!!`
+app.get('/', (req, res) =&gt; res.send('Hi There!!'));
+
+// app will be run on port `8080`
+app.listen(8080);
+</code></pre>
+
+<p>Time to create a <code>Dockerfile</code>. Before we create the <code>Dockerfile</code>, we need to consider some concept and instructions.</p>
+<h3 id="selecting-a-base-image">Selecting A Base Image</h3>
+<hr />
+<p>A <code>base image</code> contains is a collection of preinstalled programs. In the <a href="https://hub.docker.com">docker hub</a>, if we look for the <code>node</code> image, we should find images with different version along with <code>alpine</code> tag. This <code>node</code> images has the <code>node</code> and <code>npm</code> installed.</p>
+<blockquote>
+<p><code>alpine</code> is being used in the docker world to signify an image as small and compact as possible.</p>
+<p><code>docker hub</code> is a repository of docker images.</p>
+</blockquote>
+<p>We can select a <code>base image</code> of <code>node</code> with the command.</p>
+<pre><code class="bash">FROM node:alpine
+</code></pre>
+
+<h3 id="load-application-files">Load Application Files</h3>
+<hr />
+<p>After building a container, we can stat the image. As soon as the <code>container</code> boots up, <code>file snapshot</code> of the <code>image</code> is copied to the <code>namespace</code> area. And this <code>file snapshot</code> is the base image <code>file snapshot</code>, does not contains our working directory, like <code>package.json</code> or <code>index.js</code>. We need to use an <code>instruction</code> to take our files to the <code>container</code> file systems.</p>
+<p>To copy our local files to the <code>container</code> file system, we need to use <code>COPY</code> instruction. It takes two arguments, first one is the path of local file system path. The second one is the <code>container</code> file path.</p>
+<pre><code class="bash">COPY ./ ./
+</code></pre>
+
+<h3 id="port-mapping">Port Mapping</h3>
+<hr />
+<p>When we run a web application in the <code>container</code> tha port in the <code>container</code> can not be accessed from the <code>local</code> machine by default. We need to do a <code>port mapping</code> that will define which port from the <code>local server</code> direct the traffic to the <code>container</code> port.</p>
+<p>So while we start the <code>container</code> we have to map the <code>port</code>.</p>
+<pre><code class="bash">docker run -p local_machine_port:container_app_port image_id
+</code></pre>
+
+<h3 id="create-a-working-directory">Create A Working Directory</h3>
+<p>By default while we copy the file from the local machine to the <code>container</code>, in container the files persist on the <code>root directory</code>. We might want to put the project files in the separate directory. We can define our working directory by <code>WORKDIR</code> instruction. This <code>WORKDIR</code> will create if not exist and use as the project directory when we copy the files from the local file system to the <code>container</code>.</p>
+<hr />
+<pre><code class="bash">WORKDIR /usr/app
+</code></pre>
+
+<h3 id="avoid-unnecessary-builds">Avoid Unnecessary Builds</h3>
+<hr />
+<p>We need to be careful, for each file changes, we should not reinstall the packages. We can copy the <code>package.json</code> file before the <code>package installation</code>. Then we will copy the all other files.</p>
+<p>In this case, for random files changes, the <code>package installation</code> will be taken from the cache. Example</p>
+<pre><code class="bash">COPY ./package.json ./
+RUN npm install
+COPY ./ ./
+</code></pre>
+
+<h3 id="final-docker-file"><strong>Final <code>Docker</code> File</strong></h3>
+<p>With all these consideration, create a <code>Dockerfile</code> in the project root directory. our <code>Dockerfile</code> should be,</p>
+<pre><code class="bash">FROM node:alpine
+WORKDIR /usr/app
+COPY ./package.json ./
+RUN npm install
+COPY ./ ./
+CMD [&quot;node&quot;, &quot;index.js&quot;]
+</code></pre>
+
+<p>Let's build a <code>image</code> from this <code>Dockerfile</code>,</p>
+<pre><code class="bash">docker build -t bmshamsnahid/myapp .
+</code></pre>
+
+<p>After build the image, let run it with the <code>tag</code>,</p>
+<pre><code class="bash"># Import the base image
+FROM node:alpine
+
+# Create a working directory for the app
+WORKDIR /usr/app
+
+# Only if we change the `package.json` file, the npm will install all the modules along with the new one
+COPY ./package.json ./
+RUN npm install
+
+# Copy all the project files to the `container`
+COPY ./ ./
+
+# Set the start up command to run the server
+CMD [&quot;node&quot;, &quot;index.js&quot;]
+</code></pre>
+
+<p>In the web browser <code>http://localhost:5000/</code> should print the following</p>
+<pre><code>Hi There!!
+</code></pre>
+
+<p>Congratulations!!! You just ran a node application in docker container.</p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021 <a href="https://shams-nahid.com/">Shams Nahid</a>.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js" defer></script>
+        <script src="../../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

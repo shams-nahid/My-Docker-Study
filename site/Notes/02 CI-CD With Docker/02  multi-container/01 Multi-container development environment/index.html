@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Shams Nahid">
+        <link rel="canonical" href="http://docker-study.shams-nahid.com/Notes/02 CI-CD With Docker/02  multi-container/01 Multi-container development environment/">
+        <link rel="shortcut icon" href="../../../../img/favicon.ico">
+        <title>01 Multi container development environment - Docker Study Notes</title>
+        <link href="../../../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link href="../../../../css/extra.css" rel="stylesheet">
+
+        <script src="../../../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../../..">Docker Study Notes</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../../../..">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">01 Docker Essential</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../01 Docker Essential/01 Docker 101/">01 Docker 101</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/02 Docker Container/">02 Docker Container</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/03 Docker Lifecycle/">03 Docker Lifecycle</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/04 Docker Basic Commands/">04 Docker Basic Commands</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/05 Create Custom Image/">05 Create Custom Image</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/06 Wrap Web App in Docker/">06 Wrap Web App in Docker</a>
+</li>
+            
+<li >
+    <a href="../../../01 Docker Essential/07 Using Docker Compose/">07 Using Docker Compose</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">02 CI CD With Docker</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../01 Single Container CI-CD Workflow/">01 Single Container CI CD Workflow</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02  multi container</a>
+    <ul class="dropdown-menu">
+            
+<li class="active">
+    <a href="./">01 Multi container development environment</a>
+</li>
+            
+<li >
+    <a href="../02 Multi-container Continuous Integration/">02 Multi container Continuous Integration</a>
+</li>
+            
+<li >
+    <a href="../03 Multi-container Continuous Deployment/">03 Multi container Continuous Deployment</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">03 Running container Like A Boss</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/01 Intro/">Using Container Like A Boss</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/02 Play With Nginx Server/">Play With Nginx Server</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/03 With Container Run/">With Container Run</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/04 Container vs VM/">Container vs VM</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/05 Windows Containers/">Windows Containers</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/06 Assignment of Multiple Containers/">06 Assignment of Multiple Containers</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/07 CLI Process Monitoring/">07 CLI Process Monitoring</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/08 Getting a Shell Inside a Container/">08 Getting a Shell Inside a Container</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/09 IP Fact/">09 IP Fact</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/10 Container Networking/">10 Container Networking</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/11 Assignments/">11 Assignments</a>
+</li>
+            
+<li >
+    <a href="../../../03 Running container Like A Boss/12 Assignment/">12 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">04 Images</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../04 Images/01 Caching/">01 Caching</a>
+</li>
+            
+<li >
+    <a href="../../../04 Images/02 Tagging/">02 Tagging</a>
+</li>
+            
+<li >
+    <a href="../../../04 Images/03 Building Image/">03 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../../04 Images/04 Assignment/">04 Assignment</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">05 Volumes</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../05 Volumes/01 Data Persistent/">01 Data Persistent</a>
+</li>
+            
+<li >
+    <a href="../../../05 Volumes/02 Data Volumes/">02 Data Volumes</a>
+</li>
+            
+<li >
+    <a href="../../../05 Volumes/03 Bind Mounting/">03 Bind Mounting</a>
+</li>
+            
+<li >
+    <a href="../../../05 Volumes/04 Assignment: Named Volumes/">04 Assignment: Named Volumes</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">06 Docker Compose</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../06 Docker Compose/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../../06 Docker Compose/02 Example/">02 Example</a>
+</li>
+            
+<li >
+    <a href="../../../06 Docker Compose/03 Assignment 01/">03 Assignment 01</a>
+</li>
+            
+<li >
+    <a href="../../../06 Docker Compose/04 Building Image/">04 Building Image</a>
+</li>
+            
+<li >
+    <a href="../../../06 Docker Compose/05 Assignment 02/">05 Assignment 02</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">07 swarm</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../07 swarm/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../../07 swarm/02 Swarm Service/">02 Swarm Service</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#">08 Docker on AWS</a>
+    <ul class="dropdown-menu">
+            
+  <li class="dropdown-submenu">
+    <a href="#">01 ECS Quick Start</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../08 Docker on AWS/01 ECS Quick Start/01 ECS vs Fargate/">01 ECS vs Fargate</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/01 ECS Quick Start/02 IAM User/">02 IAM User</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/01 ECS Quick Start/03 First Container Launch/">03 First Container Launch</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/01 ECS Quick Start/04 ECS Pricing/">04 ECS Pricing</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#">02 ECS Cluster Setup</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../../08 Docker on AWS/02 ECS Cluster Setup/01 Overview/">01 Overview</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/02 ECS Cluster Setup/02 IAM Roles For ECS/">02 IAM Roles For ECS</a>
+</li>
+            
+<li >
+    <a href="../../../08 Docker on AWS/02 ECS Cluster Setup/03 Core Infrastructure for ECS/">03 Core Infrastructure for ECS</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../../01 Single Container CI-CD Workflow/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../02 Multi-container Continuous Integration/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/bmshamsnahid/My-Docker-Study"><i class="fa fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#multi-container-development-environment">Multi-container development environment</a></li>
+            <li><a href="#application-architecture-with-image">Application Architecture With Image</a></li>
+            <li><a href="#boilerplate-code">Boilerplate Code</a></li>
+            <li><a href="#docker-dev-for-react-app">Docker Dev For React App</a></li>
+            <li><a href="#docker-dev-for-express-server">Docker Dev For Express Server</a></li>
+            <li><a href="#docker-dev-for-worker">Docker Dev For Worker</a></li>
+            <li><a href="#adding-postgres-server-worker-and-client-service">Adding Postgres, Server, Worker and Client Service</a></li>
+            <li><a href="#nginx-configuration">Nginx Configuration</a></li>
+            <li><a href="#nginx-container">Nginx Container</a></li>
+            <li><a href="#enable-websocket-connection">Enable Websocket Connection</a></li>
+            <li><a href="#update-the-ui">Update the UI</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="multi-container-development-environment">Multi-container development environment</h2>
+<p>Today we are going to make an app that is responsible to generate fibonacci number. But instead of writing a simple method, we will take it to next level and put couple of complexity layer to serve our sole purpose, multi container CI/CD.</p>
+<p>We will have a react application, that will take the input for a user to get the fibonacci number of a certain index.</p>
+<p>This index will pass to the backend server. We will use an express server in the backend. The express server will save the index in <code>Postgres</code> and also store the index in the redis server. A worker process will be responsible for generating the fibonacci number. It will generate, put the result in the redis and then finally return the response to the react application.</p>
+<p>Too much complexity!! We are taking this complexity just to make multiple container and implement CI/CD.</p>
+<h3 id="application-architecture-with-image">Application Architecture With Image</h3>
+<hr />
+<p>Architecture image goes here.</p>
+<h3 id="boilerplate-code">Boilerplate Code</h3>
+<hr />
+<p>A boilerplate code is being found in the <code>resource directory</code>.</p>
+<p><strong>description of boilerplate goes here</strong></p>
+<p>To make the development process smoother, we will make development version of each docker container. This will help us not to rebuild the image every time we make changes in development phase.</p>
+<p>For each of the projects, we will set up pretty similar docker file workflow. For each of the project we will go through,</p>
+<ul>
+<li>Copy the <code>package.json</code> to the container</li>
+<li>Run <code>npm install</code> to install all the dependencies</li>
+<li>Copy everything else</li>
+<li>Volume mapping for hot-reload feature</li>
+</ul>
+<h3 id="docker-dev-for-react-app">Docker Dev For React App</h3>
+<hr />
+<p>First go to the <code>client</code> directory and create a <code>Dockerfile.dev</code>,</p>
+<pre><code class="bash">cd client
+touch Dockerfile.dev
+</code></pre>
+
+<p>And our <code>Dockerfile.dev</code> should be,</p>
+<pre><code class="docker">FROM node:alpine
+WORKDIR '/app'
+COPY ./package.json ./
+RUN npm install
+COPY . .
+CMD [&quot;npm&quot;, &quot;run&quot;, &quot;start&quot;]
+</code></pre>
+
+<p>Let's build an image out of this <code>Dockerfile</code>,</p>
+<pre><code class="bash">docker build -f Dockerfile.dev .
+</code></pre>
+
+<p>This should build an image and give us a <code>image_id</code>.</p>
+<p>Now we can run the react app using the image id,</p>
+<pre><code class="bash">docker run -it image_id
+</code></pre>
+
+<p>This should start the development server of our react app. Since we have not port mapping yet, we can not access the site.</p>
+<h3 id="docker-dev-for-express-server">Docker Dev For Express Server</h3>
+<hr />
+<p>Go to the <code>server</code> directory and create a file named <code>Dockerfile.dev</code>,</p>
+<pre><code class="bash">cd server
+touch Dockerfile.dev
+</code></pre>
+
+<p>Our <code>Dockerfile.dev</code> file should be like following,</p>
+<pre><code class="docker">FROM node:14.14.0-alpine
+WORKDIR '/app'
+COPY ./package.json ./
+RUN npm install
+COPY . .
+CMD [&quot;npm&quot;, &quot;run&quot;, &quot;dev&quot;]
+</code></pre>
+
+<p>Let's build an image out of this <code>Dockerfile</code>,</p>
+<pre><code class="bash">docker build -f Dockerfile.dev .
+</code></pre>
+
+<p>This should build an image and give us a <code>image_id</code>.</p>
+<p>Now we can run the react app using the image id,</p>
+<pre><code class="bash">docker run -it image_id
+</code></pre>
+
+<p>This should start the express server on port <code>5000</code>.</p>
+<h3 id="docker-dev-for-worker">Docker Dev For Worker</h3>
+<p>Go to the <code>worker</code> directory and create a <code>docker-file</code> named <code>Dockerfile.dev</code>,</p>
+<pre><code class="bash">cd worker
+touch Dockerfile.dev
+</code></pre>
+
+<p>Our <code>Dockerfile.dev</code> should be like the following, same as the express server <code>Dockerfile.dev</code>,</p>
+<pre><code class="docker">FROM node:14.14.0-alpine
+WORKDIR '/app'
+COPY ./package.json ./
+RUN npm install
+COPY . .
+CMD [&quot;npm&quot;, &quot;run&quot;, &quot;dev&quot;]
+</code></pre>
+
+<p>Let's build an image out of this <code>Dockerfile</code>,</p>
+<pre><code class="bash">docker build -f Dockerfile.dev .
+</code></pre>
+
+<p>This should build an image and give us a <code>image_id</code>.</p>
+<p>Now we can run the react app using the image id,</p>
+<pre><code class="bash">docker run -it image_id
+</code></pre>
+
+<p>This should make the worker process standby, so it can listen whenever we insert a message in the redis server.</p>
+<h3 id="adding-postgres-server-worker-and-client-service">Adding <code>Postgres</code>, <code>Server</code>, <code>Worker</code> and <code>Client</code> Service</h3>
+<hr />
+<p>Now we have docker-file for the client, server and worker process. Now, we are going to put a docker-compose file to make all the application start up more easy.</p>
+<p>Each of the application container require different arguments, like the express server require a port mapping for port <code>5000</code>, react app need a port mapping <code>3000</code>. We also need to make sure the worker process has the access to redis server. Also the express server needs access of <code>redis</code> server and <code>postgres</code> server. Along with these integrations, we have to provide all the environment variables to the container.</p>
+<p>To do so, we first integrate the express server with the <code>redis-server</code> and <code>postgres-database</code>. After that, we will connect all other pieces, the <code>Nginx server</code>, react app and worker process.</p>
+<p>Let's create the <code>docker-compose.yml</code> file in the project root directory,</p>
+<pre><code class="bash">touch docker-compose.yml
+</code></pre>
+
+<p>Our <code>docker-compose.yml</code> file should be,</p>
+<pre><code class="yml">version: &quot;3&quot;
+services:
+  postgres:
+    image: &quot;postgres:latest&quot;
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  redis:
+    image: &quot;redis:latest&quot;
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+</code></pre>
+
+<p>We cn build and run the container from our root directory by,</p>
+<pre><code class="bash">docker-compose up --build
+</code></pre>
+
+<h3 id="nginx-configuration"><code>Nginx</code> Configuration</h3>
+<hr />
+<p>From browser, we will make request for static resources and seek <code>API</code>. For react application, we will make the call similar like, <code>/main.js</code>, <code>/index.html</code>. But for server api, we will make call on endpoints like <code>/api/values/all</code>, <code>/api/values/current</code> etc. You might notice our express server does not have <code>/api</code> as prefix. It has endpoints like <code>/values/all</code>, <code>/values/current</code>.</p>
+<p>Our <code>Nginx</code> server will handle and do the separation. For api endpoints, start with <code>/api</code> it will remove the <code>/api</code> part and redirect to the express server. Other request will be send to the <code>react</code> application.</p>
+<p>Whenever we create a <code>Nginx</code> server, it will use a configuration file named <code>default.conf</code>. Here in this <code>default.conf</code> file, we have to put couple of following information,</p>
+<ul>
+<li>Notify <code>Nginx</code> that, we have a upstream server at <code>client:3000</code></li>
+<li>Notify <code>Nginx</code> that, we have a upstream server at <code>server:5000</code></li>
+<li>Both <code>client:3000</code> and <code>server:3000</code> should listen to port <code>80</code></li>
+<li>Add a condition to pass all the <code>/</code> request to <code>client:3000</code></li>
+<li>Add another condition to pass all the <code>/api</code> request to <code>server:5000</code></li>
+</ul>
+<p>Here <code>client:3000</code> and <code>server:5000</code>, comes from the service name we are using in the <code>docker-compose</code> file.</p>
+<p>Lets create a directory named <code>nginx</code> inside the root project and create a file <code>default.conf</code> inside the directory.</p>
+<pre><code class="bash">mkdir nginx
+cd nginx
+touch default.conf
+</code></pre>
+
+<p>Our <code>default.conf</code> file should be,</p>
+<pre><code class="nginx">upstream client {
+  server client:3000;
+}
+
+upstream api {
+  server api:5000;
+}
+
+server {
+  listen 80;
+
+  location / {
+    proxy_pass http://client;
+  }
+
+  location /api {
+    rewrite /api/(.*) /$1 break;
+    proxy_pass http://api;
+  }
+}
+</code></pre>
+
+<blockquote>
+<p>In Nginx config <code>rewrite /api/(.*) /$1 break;</code> means, replace <code>/api</code> with <code>$1</code> and <code>$1</code> stands for the matching part <code>(.*)</code> of the url. <code>break</code> keyword stands for stopping any other rewriting rules after applying the current one.</p>
+</blockquote>
+<h3 id="nginx-container"><code>Nginx</code> Container</h3>
+<hr />
+<p>We set up the <code>nginx</code> configuration. Time to set up a docker file for the <code>nginx server</code>.</p>
+<p>Go to the <code>nginx</code> directory and create a file named <code>Dockerfile.dev</code>,</p>
+<pre><code class="bash">cd nginx
+touch Dockerfile.dev
+</code></pre>
+
+<p>Our <code>Dockerfile.dev</code> should look like the following,</p>
+<pre><code class="yml">FROM nginx
+COPY ./default.conf /etc/nginx/conf.d/default.conf
+</code></pre>
+
+<p>Thats pretty much it. Last thing we need to do, is add the <code>nginx</code> service in our <code>docker-compose.yml</code> file.</p>
+<p>We need to add the following <code>nginx</code> service to our <code>docker-compose</code> file,</p>
+<pre><code class="yml">nginx:
+  restart: always
+  build:
+    dockerfile: Dockerfile.dev
+    context: ./nginx
+  ports:
+    - &quot;3050:80&quot;
+</code></pre>
+
+<p>Since our <code>nginx</code> server is do all the routing, no matter what, we want our <code>nginx</code> server up and running. So, we put <code>restart</code> property <code>always</code>. In this case, we also do the port mapping from local machine to the container.</p>
+<p>With adding the <code>nginx</code> service to our existing <code>docker-compose</code>, our <code>docker-compose.yml</code> file should be,</p>
+<pre><code class="yml">version: &quot;3&quot;
+services:
+  postgres:
+    image: &quot;postgres:latest&quot;
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  redis:
+    image: &quot;redis:latest&quot;
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - &quot;3050:80&quot;
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+</code></pre>
+
+<p>Now time to start all the containers by,</p>
+<pre><code class="bash">docker-compose up --build
+</code></pre>
+
+<p>Most probably, first time, the server and worker both try to get the redis instance, even it might not being copied. So In case of any error, we just have do run the container one more time by,</p>
+<pre><code class="bash">docker-compose up
+</code></pre>
+
+<p>Now, from the local machine browser, if we go to <code>http://localhost:3050/</code>, we should see the react app and calculation should work with manual refresh.</p>
+<h3 id="enable-websocket-connection">Enable Websocket Connection</h3>
+<p>The react application keep an connection with it's development server to maintain hot reload. Every time there is a source code changes, react app listen these changes via websocket connection and reload the web app.</p>
+<p>We need to configure the <code>nginx</code> server to enable the websocket to handle the issue.</p>
+<p>To add websocket connection we need a route in the <code>default.config</code> file,</p>
+<pre><code class="nginx">location /sockjs-node {
+    proxy_pass http://client;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection &quot;Upgrade&quot;;
+  }
+</code></pre>
+
+<p>So our final configuration for the <code>nginx</code> server will be,</p>
+<pre><code class="nginx">upstream client {
+  server client:3000;
+}
+
+upstream api {
+  server api:5000;
+}
+
+server {
+  listen 80;
+
+  location / {
+    proxy_pass http://client;
+  }
+
+  location /sockjs-node {
+    proxy_pass http://client;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection &quot;Upgrade&quot;;
+  }
+
+  location /api {
+    rewrite /api/(.*) /$1 break;
+    proxy_pass http://api;
+  }
+}
+</code></pre>
+
+<p>Now, we can test all the container by running,</p>
+<pre><code class="bash">docker-compose up --build
+</code></pre>
+
+<h3 id="update-the-ui">Update the UI</h3>
+<p>Go to <code>client</code> directory and from the <code>/src</code> directory, update the <code>App.js</code> by the followings,</p>
+<pre><code class="jsx">import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import OtherPage from './OtherPage';
+import Fib from './Fib';
+
+function App() {
+  return (
+    &lt;Router&gt;
+      &lt;div&gt;
+        &lt;Route exact path=&quot;/&quot; component={Fib} /&gt;
+        &lt;Route path=&quot;/otherpage&quot; component={OtherPage} /&gt;
+      &lt;/div&gt;
+    &lt;/Router&gt;
+  );
+}
+
+export default App;
+</code></pre>
+
+<p>Our app should be running on <code>http://localhost:3050/</code>. </p>
+<p>Go to browser and go the address <code>http://localhost:3050/</code>. In the input box, put the value <code>2</code> and click submit. Now if we reload the web page, the value 4 should be appeared.</p>
+<p>Seems like our app is running smoothly on the development machine as expected.</p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021 <a href="https://shams-nahid.com/">Shams Nahid</a>.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../../js/base.js" defer></script>
+        <script src="../../../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
